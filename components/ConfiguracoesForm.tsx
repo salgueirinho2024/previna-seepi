@@ -69,7 +69,7 @@ export function AccountForm({
 
   useEffect(() => {
     if (state.success) {
-      update({ name: state.name, image: state.image });
+      update({ name: state.name });
       router.refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
