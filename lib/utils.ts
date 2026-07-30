@@ -38,6 +38,22 @@ export const MOTIVOS_SOLICITACAO = [
   "Substituição",
 ] as const;
 
+export const MOTIVOS_DEVOLUCAO = [
+  "Desligamento",
+  "Recolhimento",
+  "Troca de item",
+  "Item danificado",
+  "Outro",
+] as const;
+
+/** Classifica um item entregue de acordo com a data de próxima troca. */
+export function trocaStatus(proximaTroca: Date | string, diasAviso: number): "vencida" | "atencao" | "ok" {
+  const dias = daysUntil(proximaTroca);
+  if (dias < 0) return "vencida";
+  if (dias <= diasAviso) return "atencao";
+  return "ok";
+}
+
 export function statusBadgeClasses(status: string) {
   switch (status) {
     case "entregue":

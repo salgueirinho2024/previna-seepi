@@ -124,9 +124,8 @@ export async function efetuarEntrega(id: string) {
   revalidatePath("/dashboard");
 }
 
-const TIPOS_ASSINATURA = ["digital", "facial", "whatsapp", "email"] as const;
-
-export async function assinarEntrega(entregaId: string, tipo: (typeof TIPOS_ASSINATURA)[number]) {
+/** A assinatura agora é sempre manual/escrita — coletada no papel e apenas confirmada aqui. */
+export async function assinarEntrega(entregaId: string) {
   const session = await requireSession();
   const entrega = await prisma.entrega.findFirst({
     where: { id: entregaId, empresaId: session.user.empresaId },
@@ -135,7 +134,7 @@ export async function assinarEntrega(entregaId: string, tipo: (typeof TIPOS_ASSI
 
   await prisma.entrega.update({
     where: { id: entregaId },
-    data: { assinado: true, assinaturaTipo: tipo, assinadoEm: new Date() },
+    data: { assinado: true, assinaturaTipo: "manual", assinadoEm: new Date() },
   });
 
   revalidatePath(`/solicitacoes/${entrega.solicitacaoId}`);

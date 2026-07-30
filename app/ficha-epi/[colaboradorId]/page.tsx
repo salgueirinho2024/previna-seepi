@@ -12,6 +12,7 @@ export default async function FichaEpiPage({ params }: { params: { colaboradorId
     where: { id: params.colaboradorId, empresaId: session.user.empresaId },
     include: {
       unidade: true,
+      setor: true,
       empresa: true,
       entregas: {
         include: { itens: { include: { item: true } } },
@@ -74,7 +75,7 @@ export default async function FichaEpiPage({ params }: { params: { colaboradorId
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-ink-300">Setor</p>
-            <p className="mt-0.5 font-medium text-ink-800">{colaborador.setor ?? "—"}</p>
+            <p className="mt-0.5 font-medium text-ink-800">{colaborador.setor?.nome ?? "—"}</p>
           </div>
           <div>
             <p className="text-xs uppercase tracking-wide text-ink-300">Unidade</p>
@@ -114,7 +115,7 @@ export default async function FichaEpiPage({ params }: { params: { colaboradorId
                   <td className="py-2 pr-2 align-top">
                     {linha.entrega.assinado ? (
                       <span className="text-brand-700">
-                        ✓ assinado ({linha.entrega.assinaturaTipo}) em {formatDate(linha.entrega.assinadoEm)}
+                        ✓ assinado (manual) em {formatDate(linha.entrega.assinadoEm)}
                       </span>
                     ) : (
                       <span className="text-ink-300">pendente</span>

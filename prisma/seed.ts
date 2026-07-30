@@ -15,6 +15,7 @@ async function main() {
       id: "empresa-demo",
       nome: "Bambuí Bioenergia S/A",
       cnpj: "00.000.000/0001-00",
+      diasAvisoTroca: 30,
       unidades: {
         create: [{ nome: "Matriz" }, { nome: "Unidade Industrial" }],
       },
@@ -32,16 +33,6 @@ async function main() {
 
   const [matriz, unidadeIndustrial] = empresa.unidades;
 
-  const colaboradores = await Promise.all(
-    [
-      { nome: "João da Silva", matricula: "FUNC001", cpf: "111.111.111-11", cargo: "Operador de Produção", setor: "Produção", unidadeId: unidadeIndustrial.id },
-      { nome: "Maria Oliveira", matricula: "FUNC002", cpf: "222.222.222-22", cargo: "Técnica de Segurança", setor: "SSMA", unidadeId: matriz.id },
-      { nome: "Carlos Souza", matricula: "FUNC003", cpf: "333.333.333-33", cargo: "Eletricista", setor: "Manutenção", unidadeId: unidadeIndustrial.id },
-    ].map((data) =>
-      prisma.colaborador.create({ data: { ...data, empresaId: empresa.id } })
-    )
-  );
-
   const itens = await Promise.all(
     [
       { nome: "Capacete de Segurança 3M H-700", ca: "29638", fabricante: "3M", categoriaNR: "EPI (NR-6) • Proteção do crânio", custoUnitario: 35.9, periodicidadeDias: 730, estoqueAtual: 40, estoqueMinimo: 10 },
@@ -52,7 +43,47 @@ async function main() {
     ].map((data) => prisma.itemEPI.create({ data: { ...data, empresaId: empresa.id } }))
   );
 
-  const [capacete, oculos, luva] = itens;
+  const [capacete, oculos, luva, protetorAuricular, botina] = itens;
+
+  // Setores com os EPIs obrigatórios definidos
+  const setorProducao = await prisma.setor.create({
+    data: {
+      nome: "Produção",
+      empresaId: empresa.id,
+      itensObrigatorios: {
+        create: [{ itemId: capacete.id }, { itemId: oculos.id }, { itemId: protetorAuricular.id }, { itemId: botina.id }],
+      },
+    },
+  });
+
+  const setorManutencao = await prisma.setor.create({
+    data: {
+      nome: "Manutenção",
+      empresaId: empresa.id,
+      itensObrigatorios: {
+        create: [{ itemId: capacete.id }, { itemId: luva.id }, { itemId: botina.id }],
+      },
+    },
+  });
+
+  const setorSSMA = await prisma.setor.create({
+    data: {
+      nome: "SSMA",
+      empresaId: empresa.id,
+      itensObrigatorios: {
+        create: [{ itemId: oculos.id }],
+      },
+    },
+  });
+
+  const colaboradores = await Promise.all(
+    [
+      { nome: "João da Silva", matricula: "FUNC001", cpf: "111.111.111-11", cargo: "Operador de Produção", setorId: setorProducao.id, unidadeId: unidadeIndustrial.id },
+      { nome: "Maria Oliveira", matricula: "FUNC002", cpf: "222.222.222-22", cargo: "Técnica de Segurança", setorId: setorSSMA.id, unidadeId: matriz.id },
+      { nome: "Carlos Souza", matricula: "FUNC003", cpf: "333.333.333-33", cargo: "Eletricista", setorId: setorManutencao.id, unidadeId: unidadeIndustrial.id },
+    ].map((data) => prisma.colaborador.create({ data: { ...data, empresaId: empresa.id } }))
+  );
+
   const [joao, maria] = colaboradores;
 
   // Solicitação + entrega já concluída e assinada, para popular a Ficha de EPI de exemplo
@@ -72,22 +103,24 @@ async function main() {
     },
   });
 
-  await prisma.entrega.create({
+  const entrega = await prisma.entrega.create({
     data: {
       empresaId: empresa.id,
       solicitacaoId: solicitacao.id,
       colaboradorId: joao.id,
       assinado: true,
-      assinaturaTipo: "digital",
+      assinaturaTipo: "manual",
       assinadoEm: new Date(),
       itens: {
         create: [
           { itemId: capacete.id, quantidade: 1, proximaTroca: new Date(Date.now() + 730 * 86400000) },
           { itemId: oculos.id, quantidade: 1, proximaTroca: new Date(Date.now() + 180 * 86400000) },
-          { itemId: luva.id, quantidade: 2, proximaTroca: new Date(Date.now() + 90 * 86400000) },
+          // Proposital: essa luva vence em breve, pra aparecer no aviso de troca do dashboard
+          { itemId: luva.id, quantidade: 2, proximaTroca: new Date(Date.now() + 5 * 86400000) },
         ],
       },
     },
+    include: { itens: true },
   });
 
   // Solicitação pendente, para popular a tela de Solicitações
@@ -98,6 +131,20 @@ async function main() {
       motivo: "Troca periódica",
       status: "pendente",
       itens: { create: [{ itemId: oculos.id, quantidade: 1 }] },
+    },
+  });
+
+  // Devolução de exemplo (apenas histórico — não mexe no estoque)
+  const luvaEntregaItem = entrega.itens.find((i) => i.itemId === luva.id)!;
+  await prisma.devolucao.create({
+    data: {
+      empresaId: empresa.id,
+      colaboradorId: joao.id,
+      itemId: luva.id,
+      entregaItemId: luvaEntregaItem.id,
+      quantidade: 1,
+      motivo: "Item danificado",
+      observacao: "Uma das luvas rasgou durante o uso.",
     },
   });
 

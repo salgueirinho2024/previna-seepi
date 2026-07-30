@@ -9,15 +9,24 @@ e-mail/senha) + Tailwind CSS.
 ## O que tem pronto neste pacote
 
 - Cadastro de empresa/admin (`/register`) e login (`/login`)
-- Painel (`/dashboard`) com indicadores
+- Painel (`/dashboard`) com indicadores e **avisos de troca periódica** (configurável
+  em dias de antecedência)
 - Inventário de EPIs com estoque (`/inventario`)
-- Colaboradores (`/colaboradores`)
-- Solicitações de EPI → aprovação → entrega → assinatura (`/solicitacoes`)
+- Colaboradores (`/colaboradores`), vinculados a um **setor** (`/setores`) que define
+  quais EPIs são obrigatórios
+- Solicitações de EPI → aprovação → entrega → **assinatura manual/escrita**
+  (`/solicitacoes`)
+- **Devoluções** (`/devolucoes`) — registra devolução de EPI (desligamento, recolhimento
+  etc). É só histórico: **não altera o estoque automaticamente**
+- **Relatórios** (`/relatorios`) — EPIs entregues por projeto/unidade, com filtro de
+  período e totais de custo
+- **Configurações** (`/configuracoes`) — dias de antecedência do aviso de troca
 - **Ficha de EPI imprimível/PDF por colaborador** (`/ficha-epi/[colaboradorId]`) — histórico
   completo de entregas, CA, datas, próxima troca e declaração de recebimento, pronta para
   imprimir (`Ctrl/Cmd+P` → Salvar como PDF)
-- `prisma/seed.ts` com dados de exemplo (1 empresa, 3 colaboradores, 5 itens de EPI,
-  1 entrega já assinada para você ver a Ficha de EPI populada, 1 solicitação pendente)
+- `prisma/seed.ts` com dados de exemplo (1 empresa, 3 setores, 3 colaboradores, 5 itens
+  de EPI, 1 entrega já assinada manualmente, 1 devolução de exemplo, 1 solicitação
+  pendente)
 
 > ⚠️ Aviso importante: neste ambiente de geração de código eu não tenho acesso de rede
 > ao CDN de binários do Prisma (`binaries.prisma.sh`), então **não consegui rodar
@@ -114,10 +123,14 @@ navegue até um colaborador → **📄 Ficha de EPI** para ver a ficha pronta pa
 app/
   login/, register/         → autenticação
   (app)/                    → área logada (com menu lateral)
-    dashboard/
+    dashboard/               → painel + avisos de troca
     inventario/
     colaboradores/
+    setores/                 → cadastro de setores e EPIs obrigatórios
     solicitacoes/
+    devolucoes/               → registro de devolução (histórico, não mexe no estoque)
+    relatorios/               → relatórios por projeto/unidade
+    configuracoes/            → dias de antecedência do aviso de troca
   ficha-epi/[colaboradorId]/ → ficha imprimível (fora do menu lateral)
   api/auth/[...nextauth]/   → rota do NextAuth
 components/                 → componentes de UI e formulários
@@ -129,6 +142,7 @@ prisma/
 
 ## Próximos passos sugeridos (não incluídos ainda)
 
-- Alertas automáticos de itens com estoque baixo / EPIs próximos do vencimento do CA
+- Alertas automáticos por e-mail/WhatsApp (hoje o aviso de troca só aparece no Painel)
+- Alerta de validade do CA vencendo (hoje só existe o campo `validadeCA`, sem aviso)
 - Exportar relatório geral (todos os colaboradores) em PDF, além da ficha individual
 - Convite de novos usuários dentro da mesma empresa (hoje só o admin do cadastro existe)

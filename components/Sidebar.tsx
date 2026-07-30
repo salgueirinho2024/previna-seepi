@@ -9,7 +9,11 @@ const NAV = [
   { href: "/dashboard", label: "Painel", icon: PainelIcon },
   { href: "/inventario", label: "Inventário", icon: InventarioIcon },
   { href: "/colaboradores", label: "Colaboradores", icon: ColaboradoresIcon },
+  { href: "/setores", label: "Setores", icon: SetoresIcon },
   { href: "/solicitacoes", label: "Solicitações", icon: SolicitacoesIcon },
+  { href: "/devolucoes", label: "Devoluções", icon: DevolucoesIcon },
+  { href: "/relatorios", label: "Relatórios", icon: RelatoriosIcon },
+  { href: "/configuracoes", label: "Configurações", icon: ConfiguracoesIcon },
 ];
 
 export function Sidebar({ empresaNome }: { empresaNome: string }) {
@@ -111,6 +115,39 @@ function SairIcon() {
     <svg {...iconProps(false)}>
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <path d="M16 17l5-5-5-5M21 12H9" />
+    </svg>
+  );
+}
+function SetoresIcon({ active }: { active?: boolean }) {
+  return (
+    <svg {...iconProps(active)}>
+      <rect x="3" y="3" width="8" height="8" rx="1.5" />
+      <rect x="13" y="3" width="8" height="8" rx="1.5" />
+      <rect x="3" y="13" width="8" height="8" rx="1.5" />
+      <rect x="13" y="13" width="8" height="8" rx="1.5" />
+    </svg>
+  );
+}
+function DevolucoesIcon({ active }: { active?: boolean }) {
+  return (
+    <svg {...iconProps(active)}>
+      <path d="M4 12a8 8 0 1 1 2.5 5.8" />
+      <path d="M4 20v-5h5" />
+    </svg>
+  );
+}
+function RelatoriosIcon({ active }: { active?: boolean }) {
+  return (
+    <svg {...iconProps(active)}>
+      <path d="M4 20V10M11 20V4M18 20v-7" />
+    </svg>
+  );
+}
+function ConfiguracoesIcon({ active }: { active?: boolean }) {
+  return (
+    <svg {...iconProps(active)}>
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
     </svg>
   );
 }

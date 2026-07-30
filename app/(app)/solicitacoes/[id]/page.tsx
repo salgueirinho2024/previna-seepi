@@ -92,8 +92,10 @@ export default async function SolicitacaoDetalhePage({ params }: { params: { id:
         <div>
           {solicitacao.entrega && !solicitacao.entrega.assinado && (
             <div className="card p-5">
-              <h2 className="mb-1 text-base font-semibold text-ink-900">Recolher assinatura</h2>
-              <p className="mb-4 text-sm text-ink-500">Confirme o recebimento com o colaborador.</p>
+              <h2 className="mb-1 text-base font-semibold text-ink-900">Assinatura</h2>
+              <p className="mb-4 text-sm text-ink-500">
+                A assinatura é manual e escrita (papel/Ficha de EPI impressa). Confirme aqui após o colaborador assinar.
+              </p>
               <SignButtons entregaId={solicitacao.entrega.id} />
             </div>
           )}
@@ -103,14 +105,14 @@ export default async function SolicitacaoDetalhePage({ params }: { params: { id:
               <p className="text-3xl">✅</p>
               <p className="mt-2 text-sm font-medium text-ink-800">Entrega assinada</p>
               <p className="text-xs text-ink-300">
-                via {solicitacao.entrega.assinaturaTipo} em {formatDateTime(solicitacao.entrega.assinadoEm)}
+                assinatura manual confirmada em {formatDateTime(solicitacao.entrega.assinadoEm)}
               </p>
             </div>
           )}
 
           {!solicitacao.entrega && (
             <div className="card p-5 text-center text-sm text-ink-300">
-              Efetue a entrega para liberar a coleta de assinatura.
+              Efetue a entrega para liberar a confirmação de assinatura.
             </div>
           )}
         </div>

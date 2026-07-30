@@ -11,7 +11,7 @@ const schema = z.object({
   matricula: z.string().optional(),
   cpf: z.string().optional(),
   cargo: z.string().optional(),
-  setor: z.string().optional(),
+  setorId: z.string().optional(),
   unidadeId: z.string().optional(),
 });
 
@@ -23,7 +23,7 @@ function parseForm(formData: FormData) {
     matricula: formData.get("matricula") || undefined,
     cpf: formData.get("cpf") || undefined,
     cargo: formData.get("cargo") || undefined,
-    setor: formData.get("setor") || undefined,
+    setorId: formData.get("setorId") || undefined,
     unidadeId: formData.get("unidadeId") || undefined,
   });
 }

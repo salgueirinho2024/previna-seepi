@@ -13,7 +13,9 @@ export default async function ColaboradorDetalhePage({ params }: { params: { id:
     where: { id: params.id, empresaId: session.user.empresaId },
     include: {
       unidade: true,
+      setor: true,
       entregas: { include: { itens: { include: { item: true } } }, orderBy: { entregueEm: "desc" } },
+      devolucoes: { include: { item: true }, orderBy: { devolvidoEm: "desc" } },
     },
   });
   if (!colaborador) notFound();
@@ -23,13 +25,16 @@ export default async function ColaboradorDetalhePage({ params }: { params: { id:
       <PageHeader
         title={colaborador.nome}
         subtitle={`${colaborador.matricula ?? "sem matrícula"} · ${colaborador.cargo ?? "—"} · ${
-          colaborador.unidade?.nome ?? "sem unidade"
-        }`}
+          colaborador.setor?.nome ?? "sem setor"
+        } · ${colaborador.unidade?.nome ?? "sem unidade"}`}
       />
 
       <div className="mb-6 flex flex-wrap gap-3">
         <Link href={`/solicitacoes/nova?colaboradorId=${colaborador.id}`} className="btn-primary">
           + Nova solicitação de EPI
+        </Link>
+        <Link href={`/devolucoes/nova?colaboradorId=${colaborador.id}`} className="btn-secondary">
+          ↩️ Registrar devolução
         </Link>
         <Link href={`/ficha-epi/${colaborador.id}`} className="btn-secondary">
           📄 Ficha de EPI
@@ -56,6 +61,29 @@ export default async function ColaboradorDetalhePage({ params }: { params: { id:
                     </li>
                   ))}
                 </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="card mt-6 p-5">
+        <h2 className="mb-4 text-base font-semibold text-ink-900">Histórico de devoluções</h2>
+        {colaborador.devolucoes.length === 0 ? (
+          <EmptyState title="Nenhuma devolução registrada" />
+        ) : (
+          <div className="divide-y divide-ink-100">
+            {colaborador.devolucoes.map((d) => (
+              <div key={d.id} className="flex items-center justify-between py-3">
+                <div>
+                  <p className="text-sm font-medium text-ink-800">
+                    {d.quantidade}× {d.item.nome}
+                  </p>
+                  <p className="text-xs text-ink-300">
+                    {d.motivo} · {formatDateTime(d.devolvidoEm)}
+                    {d.observacao ? ` · ${d.observacao}` : ""}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

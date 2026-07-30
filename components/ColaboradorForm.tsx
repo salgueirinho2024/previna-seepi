@@ -13,23 +13,26 @@ function SubmitButton({ label }: { label: string }) {
 }
 
 type Unidade = { id: string; nome: string };
+type Setor = { id: string; nome: string };
 type Initial = {
   nome?: string;
   matricula?: string | null;
   cpf?: string | null;
   cargo?: string | null;
-  setor?: string | null;
+  setorId?: string | null;
   unidadeId?: string | null;
 };
 
 export function ColaboradorForm({
   action,
   unidades,
+  setores,
   initial,
   submitLabel = "Salvar",
 }: {
   action: (prev: ColaboradorFormState, formData: FormData) => Promise<ColaboradorFormState>;
   unidades: Unidade[];
+  setores: Setor[];
   initial?: Initial;
   submitLabel?: string;
 }) {
@@ -56,7 +59,19 @@ export function ColaboradorForm({
         </div>
         <div>
           <label className="label">Setor</label>
-          <input name="setor" defaultValue={initial?.setor ?? ""} className="input" />
+          <select name="setorId" defaultValue={initial?.setorId ?? ""} className="input">
+            <option value="">Sem setor</option>
+            {setores.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.nome}
+              </option>
+            ))}
+          </select>
+          {setores.length === 0 && (
+            <p className="mt-1 text-xs text-ink-300">
+              Nenhum setor cadastrado ainda. Cadastre em Setores para definir os EPIs obrigatórios.
+            </p>
+          )}
         </div>
         <div>
           <label className="label">Unidade</label>

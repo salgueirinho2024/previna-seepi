@@ -6,15 +6,15 @@ import { prisma } from "@/lib/prisma";
 
 export default async function NovoColaboradorPage() {
   const session = await requireSession();
-  const unidades = await prisma.unidade.findMany({
-    where: { empresaId: session.user.empresaId },
-    orderBy: { nome: "asc" },
-  });
+  const [unidades, setores] = await Promise.all([
+    prisma.unidade.findMany({ where: { empresaId: session.user.empresaId }, orderBy: { nome: "asc" } }),
+    prisma.setor.findMany({ where: { empresaId: session.user.empresaId }, orderBy: { nome: "asc" } }),
+  ]);
 
   return (
     <div>
       <PageHeader title="Novo colaborador" subtitle="Cadastre um colaborador para vincular EPIs" />
-      <ColaboradorForm action={createColaborador} unidades={unidades} submitLabel="Cadastrar colaborador" />
+      <ColaboradorForm action={createColaborador} unidades={unidades} setores={setores} submitLabel="Cadastrar colaborador" />
     </div>
   );
 }

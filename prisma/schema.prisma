@@ -11,6 +11,8 @@ model Empresa {
   id        String   @id @default(cuid())
   nome      String
   cnpj      String?
+  // Com quantos dias de antecedência o dashboard deve avisar sobre trocas periódicas de EPI
+  diasAvisoTroca Int @default(30)
   createdAt DateTime @default(now())
 
   users         User[]
@@ -19,6 +21,8 @@ model Empresa {
   itens         ItemEPI[]
   solicitacoes  Solicitacao[]
   entregas      Entrega[]
+  setores       Setor[]
+  devolucoes    Devolucao[]
 }
 
 model User {
@@ -49,7 +53,6 @@ model Colaborador {
   matricula String?
   cpf       String?
   cargo     String?
-  setor     String?
   createdAt DateTime @default(now())
 
   empresaId String
@@ -58,10 +61,43 @@ model Colaborador {
   unidadeId String?
   unidade   Unidade? @relation(fields: [unidadeId], references: [id])
 
+  setorId String?
+  setor   Setor? @relation(fields: [setorId], references: [id])
+
   solicitacoes Solicitacao[]
   entregas     Entrega[]
+  devolucoes   Devolucao[]
 
   @@index([empresaId])
+}
+
+/// Setor da empresa (ex: Produção, Manutenção, SSMA). Define quais EPIs
+/// são obrigatórios para quem trabalha naquele setor.
+model Setor {
+  id        String   @id @default(cuid())
+  nome      String
+  createdAt DateTime @default(now())
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  colaboradores     Colaborador[]
+  itensObrigatorios SetorItemEPI[]
+
+  @@index([empresaId])
+}
+
+/// EPI obrigatório para um determinado setor (N:N entre Setor e ItemEPI).
+model SetorItemEPI {
+  id String @id @default(cuid())
+
+  setorId String
+  setor   Setor @relation(fields: [setorId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   ItemEPI @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([setorId, itemId])
 }
 
 model ItemEPI {
@@ -81,8 +117,10 @@ model ItemEPI {
   empresaId String
   empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
 
-  solicitacaoItens SolicitacaoItem[]
-  entregaItens     EntregaItem[]
+  solicitacaoItens  SolicitacaoItem[]
+  entregaItens      EntregaItem[]
+  setoresObrigatorios SetorItemEPI[]
+  devolucoes        Devolucao[]
 
   @@index([empresaId])
 }
@@ -151,4 +189,32 @@ model EntregaItem {
 
   itemId String
   item   ItemEPI @relation(fields: [itemId], references: [id])
+
+  devolucoes Devolucao[]
+}
+
+/// Registro de devolução de um EPI (colaborador desligado, item recolhido, etc).
+/// Importante: a devolução apenas registra histórico — NÃO reverte o estoque automaticamente.
+model Devolucao {
+  id          String   @id @default(cuid())
+  quantidade  Int      @default(1)
+  motivo      String
+  observacao  String?
+  devolvidoEm DateTime @default(now())
+  createdAt   DateTime @default(now())
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  colaboradorId String
+  colaborador   Colaborador @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   ItemEPI @relation(fields: [itemId], references: [id])
+
+  entregaItemId String?
+  entregaItem   EntregaItem? @relation(fields: [entregaItemId], references: [id])
+
+  @@index([empresaId])
+  @@index([colaboradorId])
 }
