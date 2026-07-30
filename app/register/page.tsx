@@ -62,13 +62,13 @@ export default function RegisterPage() {
             <label className="label">Senha</label>
             <input name="password" type="password" required className="input" placeholder="Mínimo 6 caracteres" />
           </div>
-          {state.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{state.error}</p>}
+          {state.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">{state.error}</p>}
           <SubmitButton />
         </form>
 
         <p className="mt-6 text-center text-sm text-ink-500">
           Já tem uma conta?{" "}
-          <Link href="/login" className="font-medium text-brand-700 hover:underline">
+          <Link href="/login" className="font-medium text-brand-700 hover:underline dark:text-brand-400">
             Entrar
           </Link>
         </p>

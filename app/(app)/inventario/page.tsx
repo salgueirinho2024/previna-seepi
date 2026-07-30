@@ -39,7 +39,7 @@ export default async function InventarioPage() {
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-ink-800">{item.estoqueAtual} em estoque</p>
-                  {baixo && <Badge className="bg-red-100 text-red-700">estoque baixo</Badge>}
+                  {baixo && <Badge className="bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400">estoque baixo</Badge>}
                 </div>
               </Link>
             );

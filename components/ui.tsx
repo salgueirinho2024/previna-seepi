@@ -37,11 +37,11 @@ export function StatCard({
 }) {
   const valueTone =
     tone === "warning"
-      ? "text-amber-600"
+      ? "text-amber-600 dark:text-amber-400"
       : tone === "danger"
-      ? "text-red-600"
+      ? "text-red-600 dark:text-red-400"
       : tone === "brand"
-      ? "text-brand-600"
+      ? "text-brand-600 dark:text-brand-400"
       : "text-ink-900";
 
   return (

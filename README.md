@@ -146,3 +146,31 @@ prisma/
 - Alerta de validade do CA vencendo (hoje só existe o campo `validadeCA`, sem aviso)
 - Exportar relatório geral (todos os colaboradores) em PDF, além da ficha individual
 - Convite de novos usuários dentro da mesma empresa (hoje só o admin do cadastro existe)
+
+## Atualizações recentes (edição de conta, modo escuro, logo e vídeo)
+
+- **Editar conta** — em `Configurações` agora há a seção "Minha conta": trocar nome,
+  e-mail, foto de perfil (PNG/JPEG/WEBP até 1,5MB) e senha. A foto fica salva como
+  base64 no próprio banco (campo `image` do `User`) — simples e sem precisar de S3,
+  mas para uma base de usuários grande vale migrar para um storage de objetos depois.
+- **Modo escuro** — botão na barra lateral (ícone sol/lua). A implementação usa
+  variáveis CSS (`app/globals.css`) que trocam de valor com a classe `.dark` no
+  `<html>`, então a maior parte do app já herda o tema automaticamente. Preferência
+  salva no `localStorage` e aplicada antes da primeira renderização (sem "flash").
+- **Logo** — trocado o SVG desenhado à mão pela sua imagem exata (`public/logo.png`),
+  usada em todo o app (`components/Logo.tsx`).
+- **Favicon** — gerado a partir da mesma imagem (`public/favicon.ico` +
+  ícones PNG), configurado em `app/layout.tsx`.
+- **Vídeo na tela de login** — `public/logo-flutuando.mp4` toca em loop no painel
+  esquerdo da tela de login (`app/login/page.tsx`).
+
+### Passos para rodar depois de extrair o zip
+
+```bash
+npm install
+npx prisma db push     # aplica o novo campo `image` no banco (não há pasta migrations/, o projeto usa db push)
+npm run dev
+```
+
+Se você usa `prisma migrate`, rode `npx prisma migrate dev --name add_user_image`
+em vez do `db push`.

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { signOut } from "next-auth/react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const NAV = [
   { href: "/dashboard", label: "Painel", icon: PainelIcon },
@@ -16,11 +17,19 @@ const NAV = [
   { href: "/configuracoes", label: "Configurações", icon: ConfiguracoesIcon },
 ];
 
-export function Sidebar({ empresaNome }: { empresaNome: string }) {
+export function Sidebar({
+  empresaNome,
+  userName,
+  userImage,
+}: {
+  empresaNome: string;
+  userName?: string;
+  userImage?: string | null;
+}) {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-ink-100 bg-white">
+    <aside className="flex h-screen w-64 flex-col border-r border-ink-100 bg-surface">
       <div className="flex h-16 items-center border-b border-ink-100 px-5">
         <Logo size={28} />
       </div>
@@ -50,6 +59,29 @@ export function Sidebar({ empresaNome }: { empresaNome: string }) {
       </nav>
 
       <div className="border-t border-ink-100 p-3">
+        {userName && (
+          <Link
+            href="/configuracoes"
+            className={`mb-1 flex items-center gap-3 rounded-lg px-2 py-2 text-sm transition hover:bg-ink-100/60 ${
+              pathname === "/configuracoes" ? "bg-brand-50 text-brand-700" : "text-ink-700"
+            }`}
+          >
+            {userImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={userImage}
+                alt={userName}
+                className="h-8 w-8 shrink-0 rounded-full border border-ink-100 object-cover"
+              />
+            ) : (
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
+                {userName.slice(0, 1).toUpperCase()}
+              </span>
+            )}
+            <span className="truncate text-sm font-medium">{userName}</span>
+          </Link>
+        )}
+        <ThemeToggle />
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
           className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink-500 transition hover:bg-ink-100/60"
@@ -68,7 +100,7 @@ function iconProps(active?: boolean) {
     height: 18,
     viewBox: "0 0 24 24",
     fill: "none",
-    stroke: active ? "#00863a" : "#5b6b65",
+    stroke: active ? "rgb(var(--brand-700))" : "rgb(var(--ink-500))",
     strokeWidth: 2,
     strokeLinecap: "round" as const,
     strokeLinejoin: "round" as const,

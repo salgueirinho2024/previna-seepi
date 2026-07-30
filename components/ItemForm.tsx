@@ -118,7 +118,7 @@ export function ItemForm({
         </div>
       </div>
 
-      {state.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">{state.error}</p>}
 
       <div className="flex justify-end gap-3 border-t border-ink-100 pt-5">
         <SubmitButton label={submitLabel} />

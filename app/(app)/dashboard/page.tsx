@@ -88,7 +88,7 @@ export default async function DashboardPage() {
                     </p>
                     <p className="text-xs text-ink-300">Próxima troca: {formatDate(a.proximaTroca)}</p>
                   </div>
-                  <Badge className={a.status === "vencida" ? "bg-red-100 text-red-700" : "bg-amber-500/10 text-amber-600"}>
+                  <Badge className={a.status === "vencida" ? "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"}>
                     {a.status === "vencida" ? `Vencida há ${Math.abs(dias)} dia(s)` : `Vence em ${dias} dia(s)`}
                   </Badge>
                 </Link>

@@ -96,7 +96,7 @@ export function DevolucaoForm({
               onChange={(e) => setBusca(e.target.value)}
             />
             {resultados.length > 0 && (
-              <div className="absolute z-10 mt-1 w-full rounded-lg border border-ink-100 bg-white shadow-card">
+              <div className="absolute z-10 mt-1 w-full rounded-lg border border-ink-100 bg-surface shadow-card">
                 {resultados.map((c) => (
                   <button
                     type="button"
@@ -192,13 +192,13 @@ export function DevolucaoForm({
             </div>
           </div>
 
-          <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-700">
+          <p className="rounded-lg bg-amber-500/10 px-3 py-2 text-xs text-amber-700 dark:text-amber-400">
             Esta devolução apenas registra histórico — o estoque não é alterado automaticamente.
           </p>
         </div>
       )}
 
-      {state.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{state.error}</p>}
+      {state.error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-400">{state.error}</p>}
 
       <div className="flex justify-end">
         <SubmitButton />

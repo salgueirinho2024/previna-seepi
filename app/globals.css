@@ -4,30 +4,100 @@
 
 :root {
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* brand (green) palette — stays vivid in both modes */
+  --brand-50: 234 252 242;
+  --brand-100: 209 247 224;
+  --brand-400: 34 214 107;
+  --brand-500: 0 200 83;
+  --brand-600: 0 168 69;
+  --brand-700: 0 134 58;
+  --brand-800: 4 107 50;
+
+  /* neutral scale — light mode */
+  --bg-page: 246 248 247;
+  --surface: 255 255 255;
+  --ink-100: 228 233 231;
+  --ink-300: 147 162 156;
+  --ink-500: 91 107 101;
+  --ink-700: 51 67 61;
+  --ink-800: 28 43 38;
+  --ink-900: 15 26 23;
+}
+
+.dark {
+  --brand-50: 8 33 20;
+  --brand-100: 8 46 26;
+  --brand-400: 45 214 118;
+  --brand-500: 34 197 94;
+  --brand-600: 52 211 111;
+  --brand-700: 74 222 128;
+  --brand-800: 134 239 172;
+
+  /* neutral scale — dark mode (inverted) */
+  --bg-page: 10 14 13;
+  --surface: 22 30 28;
+  --ink-100: 42 55 50;
+  --ink-300: 104 122 115;
+  --ink-500: 154 170 163;
+  --ink-700: 201 212 207;
+  --ink-800: 224 233 229;
+  --ink-900: 241 246 244;
+}
+
+* {
+  border-color: rgb(var(--ink-100));
+}
+
+html {
+  color-scheme: light;
+}
+html.dark {
+  color-scheme: dark;
 }
 
 body {
-  background-color: #f6f8f7;
-  color: #0f1a17;
+  background-color: rgb(var(--bg-page));
+  color: rgb(var(--ink-900));
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 @layer components {
   .card {
-    @apply bg-white rounded-xl border border-ink-100 shadow-card;
+    @apply rounded-xl border border-ink-100 shadow-card transition-colors;
+    background-color: rgb(var(--surface));
+  }
+  .dark .card {
+    @apply shadow-card-dark;
   }
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-brand-600 disabled:opacity-50 disabled:pointer-events-none;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-ink-100 bg-white px-4 py-2.5 text-sm font-medium text-ink-800 transition hover:bg-ink-100/60;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-ink-100 px-4 py-2.5 text-sm font-medium text-ink-800 transition hover:bg-ink-100/60;
+    background-color: rgb(var(--surface));
   }
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100 dark:bg-red-950 dark:text-red-400 dark:hover:bg-red-900;
   }
   .input {
-    @apply w-full rounded-lg border border-ink-100 bg-white px-3 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20;
+    @apply w-full rounded-lg border border-ink-100 px-3 py-2.5 text-sm text-ink-900 placeholder:text-ink-300 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 transition-colors;
+    background-color: rgb(var(--surface));
   }
   .label {
     @apply mb-1.5 block text-sm font-medium text-ink-700;
   }
+}
+
+/* Custom scrollbar, subtle in both themes */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgb(var(--ink-100));
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background-color: transparent;
 }

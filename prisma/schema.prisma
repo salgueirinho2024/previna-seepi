@@ -31,6 +31,7 @@ model User {
   email        String   @unique
   passwordHash String
   role         String   @default("admin")
+  image        String?  @db.Text
   createdAt    DateTime @default(now())
 
   empresaId String

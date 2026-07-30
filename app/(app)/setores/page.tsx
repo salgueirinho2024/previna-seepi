@@ -46,7 +46,7 @@ export default async function SetoresPage() {
                   <span className="text-xs text-ink-300">Nenhum EPI obrigatório definido</span>
                 ) : (
                   s.itensObrigatorios.map((si) => (
-                    <Badge key={si.id} className="bg-ink-100 text-ink-700">
+                    <Badge key={si.id} className="bg-ink-100 text-ink-700 dark:text-ink-800">
                       {si.item.nome}
                     </Badge>
                   ))
