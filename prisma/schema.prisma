@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Empresa {
+  id        String   @id @default(cuid())
+  nome      String
+  cnpj      String?
+  createdAt DateTime @default(now())
+
+  users         User[]
+  unidades      Unidade[]
+  colaboradores Colaborador[]
+  itens         ItemEPI[]
+  solicitacoes  Solicitacao[]
+  entregas      Entrega[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("admin")
+  createdAt    DateTime @default(now())
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+}
+
+model Unidade {
+  id   String @id @default(cuid())
+  nome String
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  colaboradores Colaborador[]
+}
+
+model Colaborador {
+  id        String   @id @default(cuid())
+  nome      String
+  matricula String?
+  cpf       String?
+  cargo     String?
+  setor     String?
+  createdAt DateTime @default(now())
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  unidadeId String?
+  unidade   Unidade? @relation(fields: [unidadeId], references: [id])
+
+  solicitacoes Solicitacao[]
+  entregas     Entrega[]
+
+  @@index([empresaId])
+}
+
+model ItemEPI {
+  id                String    @id @default(cuid())
+  nome              String
+  ca                String?
+  fabricante        String?
+  categoriaNR       String?
+  descricao         String?
+  custoUnitario     Decimal   @default(0) @db.Decimal(10, 2)
+  periodicidadeDias Int?
+  estoqueAtual      Int       @default(0)
+  estoqueMinimo     Int       @default(0)
+  validadeCA        DateTime?
+  createdAt         DateTime  @default(now())
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  solicitacaoItens SolicitacaoItem[]
+  entregaItens     EntregaItem[]
+
+  @@index([empresaId])
+}
+
+model Solicitacao {
+  id        String   @id @default(cuid())
+  numero    Int      @default(autoincrement())
+  motivo    String
+  status    String   @default("pendente") // pendente | aprovada | entregue | cancelada
+  createdAt DateTime @default(now())
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  colaboradorId String
+  colaborador   Colaborador @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
+
+  itens   SolicitacaoItem[]
+  entrega Entrega?
+
+  @@index([empresaId])
+  @@index([colaboradorId])
+}
+
+model SolicitacaoItem {
+  id         String @id @default(cuid())
+  quantidade Int    @default(1)
+
+  solicitacaoId String
+  solicitacao   Solicitacao @relation(fields: [solicitacaoId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   ItemEPI @relation(fields: [itemId], references: [id])
+}
+
+model Entrega {
+  id             String    @id @default(cuid())
+  assinado       Boolean   @default(false)
+  assinaturaTipo String?
+  assinadoEm     DateTime?
+  entregueEm     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  solicitacaoId String      @unique
+  solicitacao   Solicitacao @relation(fields: [solicitacaoId], references: [id], onDelete: Cascade)
+
+  colaboradorId String
+  colaborador   Colaborador @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
+
+  itens EntregaItem[]
+
+  @@index([empresaId])
+  @@index([colaboradorId])
+}
+
+model EntregaItem {
+  id           String    @id @default(cuid())
+  quantidade   Int       @default(1)
+  proximaTroca DateTime?
+
+  entregaId String
+  entrega   Entrega @relation(fields: [entregaId], references: [id], onDelete: Cascade)
+
+  itemId String
+  item   ItemEPI @relation(fields: [itemId], references: [id])
+}
