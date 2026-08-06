@@ -49,7 +49,7 @@ export default async function SolicitacaoDetalhePage({ params }: { params: { id:
           <p className="mt-1 text-sm font-medium text-ink-800">{solicitacao.colaborador.unidade?.nome ?? "—"}</p>
         </div>
         <div>
-          <p className="text-xs uppercase tracking-wide text-ink-300">Solicitado em</p>
+          <p className="text-xs uppercase tracking-wide text-ink-300">Registrado em</p>
           <p className="mt-1 text-sm font-medium text-ink-800">{formatDateTime(solicitacao.createdAt)}</p>
         </div>
         <div>
@@ -68,7 +68,7 @@ export default async function SolicitacaoDetalhePage({ params }: { params: { id:
         <div className="lg:col-span-2 space-y-6">
           <div className="card p-5">
             <h2 className="mb-4 text-base font-semibold text-ink-900">
-              {solicitacao.entrega ? "Itens entregues" : "Itens solicitados"}
+              {solicitacao.entrega ? "Itens entregues" : "Itens da entrega"}
             </h2>
             <div className="divide-y divide-ink-100">
               {(solicitacao.entrega ? solicitacao.entrega.itens : solicitacao.itens).map((i) => (

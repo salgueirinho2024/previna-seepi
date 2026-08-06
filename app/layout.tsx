@@ -4,8 +4,8 @@ import { Providers } from "@/components/Providers";
 import { themeInitScript } from "@/lib/theme";
 
 export const metadata: Metadata = {
-  title: "Previna-Se | Gestão de EPI",
-  description: "Controle de entrega e estoque de EPIs",
+  title: "Previna-Se",
+  description: "Plataforma de segurança e saúde do trabalho",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

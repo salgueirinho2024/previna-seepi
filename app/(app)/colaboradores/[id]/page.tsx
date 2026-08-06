@@ -31,7 +31,7 @@ export default async function ColaboradorDetalhePage({ params }: { params: { id:
 
       <div className="mb-6 flex flex-wrap gap-3">
         <Link href={`/solicitacoes/nova?colaboradorId=${colaborador.id}`} className="btn-primary">
-          + Nova solicitação de EPI
+          + Nova entrega de EPI
         </Link>
         <Link href={`/devolucoes/nova?colaboradorId=${colaborador.id}`} className="btn-secondary">
           ↩️ Registrar devolução

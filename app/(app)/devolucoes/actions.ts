@@ -60,3 +60,17 @@ export async function registrarDevolucao(
   revalidatePath(`/colaboradores/${parsed.data.colaboradorId}`);
   redirect("/devolucoes");
 }
+
+/** Exclui uma devolução lançada por engano. Como a devolução não altera o estoque, basta apagar o registro. */
+export async function excluirDevolucao(id: string) {
+  const session = await requireSession();
+  const empresaId = session.user.empresaId;
+
+  const devolucao = await prisma.devolucao.findFirst({ where: { id, empresaId } });
+  if (!devolucao) return;
+
+  await prisma.devolucao.delete({ where: { id } });
+
+  revalidatePath("/devolucoes");
+  revalidatePath(`/colaboradores/${devolucao.colaboradorId}`);
+}

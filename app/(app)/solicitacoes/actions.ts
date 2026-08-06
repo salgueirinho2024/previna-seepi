@@ -77,6 +77,82 @@ export async function cancelarSolicitacao(id: string) {
   revalidatePath("/solicitacoes");
 }
 
+/** Desfaz um cancelamento feito por engano, voltando a entrega para "pendente". */
+export async function reabrirSolicitacao(id: string) {
+  const session = await requireSession();
+  await prisma.solicitacao.updateMany({
+    where: { id, empresaId: session.user.empresaId, status: "cancelada" },
+    data: { status: "pendente" },
+  });
+  revalidatePath(`/solicitacoes/${id}`);
+  revalidatePath("/solicitacoes");
+}
+
+/**
+ * Desfaz uma entrega já efetuada por engano: devolve a quantidade ao estoque,
+ * apaga o registro de entrega e volta a solicitação para "aprovada".
+ */
+export async function desfazerEntrega(id: string) {
+  const session = await requireSession();
+  const empresaId = session.user.empresaId;
+
+  const solicitacao = await prisma.solicitacao.findFirst({
+    where: { id, empresaId },
+    include: { entrega: { include: { itens: true } } },
+  });
+  if (!solicitacao?.entrega) return;
+
+  await prisma.$transaction(async (tx) => {
+    for (const ei of solicitacao.entrega!.itens) {
+      await tx.itemEPI.update({
+        where: { id: ei.itemId },
+        data: { estoqueAtual: { increment: ei.quantidade } },
+      });
+    }
+    await tx.entrega.delete({ where: { id: solicitacao.entrega!.id } });
+    await tx.solicitacao.update({ where: { id }, data: { status: "aprovada" } });
+  });
+
+  revalidatePath(`/solicitacoes/${id}`);
+  revalidatePath("/solicitacoes");
+  revalidatePath("/inventario");
+  revalidatePath(`/colaboradores/${solicitacao.colaboradorId}`);
+  revalidatePath("/dashboard");
+}
+
+/**
+ * Exclui a entrega/solicitação definitivamente. Se já tinha sido efetuada,
+ * devolve a quantidade ao estoque antes de apagar (evita perder o registro do estoque).
+ */
+export async function excluirSolicitacao(id: string) {
+  const session = await requireSession();
+  const empresaId = session.user.empresaId;
+
+  const solicitacao = await prisma.solicitacao.findFirst({
+    where: { id, empresaId },
+    include: { entrega: { include: { itens: true } } },
+  });
+  if (!solicitacao) return;
+
+  await prisma.$transaction(async (tx) => {
+    if (solicitacao.entrega) {
+      for (const ei of solicitacao.entrega.itens) {
+        await tx.itemEPI.update({
+          where: { id: ei.itemId },
+          data: { estoqueAtual: { increment: ei.quantidade } },
+        });
+      }
+    }
+    await tx.solicitacao.delete({ where: { id } });
+  });
+
+  revalidatePath("/solicitacoes");
+  revalidatePath("/inventario");
+  revalidatePath(`/colaboradores/${solicitacao.colaboradorId}`);
+  revalidatePath("/dashboard");
+  redirect("/solicitacoes");
+}
+
 /** Efetuar a entrega: baixa o estoque, cria o registro de Entrega e calcula a próxima troca de cada item. */
 export async function efetuarEntrega(id: string) {
   const session = await requireSession();

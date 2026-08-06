@@ -11,7 +11,7 @@ const NAV = [
   { href: "/inventario", label: "Inventário", icon: InventarioIcon },
   { href: "/colaboradores", label: "Colaboradores", icon: ColaboradoresIcon },
   { href: "/setores", label: "Setores", icon: SetoresIcon },
-  { href: "/solicitacoes", label: "Solicitações", icon: SolicitacoesIcon },
+  { href: "/solicitacoes", label: "Entregas", icon: SolicitacoesIcon },
   { href: "/devolucoes", label: "Devoluções", icon: DevolucoesIcon },
   { href: "/relatorios", label: "Relatórios", icon: RelatoriosIcon },
   { href: "/configuracoes", label: "Configurações", icon: ConfiguracoesIcon },
@@ -37,6 +37,13 @@ export function Sidebar({
       <div className="px-5 py-4">
         <p className="text-xs font-medium uppercase tracking-wide text-ink-300">Empresa</p>
         <p className="mt-0.5 truncate text-sm font-semibold text-ink-800">{empresaNome}</p>
+        <Link
+          href="/inicio"
+          className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-brand-700 hover:underline dark:text-brand-400"
+        >
+          <ModulosIcon />
+          Trocar de módulo
+        </Link>
       </div>
 
       <nav className="flex-1 space-y-1 px-3">
@@ -150,6 +157,17 @@ function SairIcon() {
     </svg>
   );
 }
+function ModulosIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+    </svg>
+  );
+}
+
 function SetoresIcon({ active }: { active?: boolean }) {
   return (
     <svg {...iconProps(active)}>

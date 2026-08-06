@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { LoginForm } from "./LoginForm";
 
@@ -15,13 +14,14 @@ export default function LoginPage() {
           muted
           playsInline
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-ink-900/80 via-ink-900/20 to-ink-900/60" />
+        <div className="absolute inset-0 bg-ink-900/35" />
         <div className="relative z-10 max-w-md px-10 text-center">
-          <h2 className="text-2xl font-semibold text-white">Gestão de EPIs sem complicação</h2>
-          <p className="mt-3 text-sm text-white/70">
-            Controle a entrega, o estoque e a troca periódica de equipamentos de proteção da sua empresa em um
-            só lugar.
-          </p>
+          <div className="rounded-2xl bg-ink-900/70 px-8 py-6 backdrop-blur-md">
+            <h2 className="text-2xl font-semibold text-white">Segurança do trabalho, sem complicação</h2>
+            <p className="mt-3 text-sm text-white/80">
+              Controle os processos de segurança e saúde ocupacional da sua empresa em um só lugar.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -33,14 +33,8 @@ export default function LoginPage() {
               <Logo size={40} />
             </div>
             <h1 className="mb-1 text-center text-lg font-semibold text-ink-900">Entrar</h1>
-            <p className="mb-6 text-center text-sm text-ink-500">Acesse o painel de gestão de EPIs</p>
+            <p className="mb-6 text-center text-sm text-ink-500">Acesse sua conta Previna-Se</p>
             <LoginForm />
-            <p className="mt-6 text-center text-sm text-ink-500">
-              Não tem uma conta?{" "}
-              <Link href="/register" className="font-medium text-brand-700 hover:underline dark:text-brand-400">
-                Cadastre sua empresa
-              </Link>
-            </p>
           </div>
         </div>
       </div>

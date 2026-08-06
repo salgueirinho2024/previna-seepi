@@ -15,13 +15,13 @@ export default async function SolicitacoesPage() {
   return (
     <div>
       <PageHeader
-        title="Solicitações"
-        subtitle={`${solicitacoes.length} solicitação(ões)`}
-        action={{ href: "/solicitacoes/nova", label: "+ Nova solicitação" }}
+        title="Entregas"
+        subtitle={`${solicitacoes.length} entrega(s)`}
+        action={{ href: "/solicitacoes/nova", label: "+ Nova entrega" }}
       />
 
       {solicitacoes.length === 0 ? (
-        <EmptyState title="Nenhuma solicitação ainda" subtitle="Crie a primeira solicitação de EPI." />
+        <EmptyState title="Nenhuma entrega ainda" subtitle="Registre a primeira entrega de EPI." />
       ) : (
         <div className="card divide-y divide-ink-100">
           {solicitacoes.map((s) => (

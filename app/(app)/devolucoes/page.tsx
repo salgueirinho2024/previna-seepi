@@ -3,6 +3,7 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { PageHeader, EmptyState } from "@/components/ui";
 import { formatDateTime } from "@/lib/utils";
+import { DevolucaoDeleteButton } from "@/components/DevolucaoDeleteButton";
 
 export default async function DevolucoesPage() {
   const session = await requireSession();
@@ -25,12 +26,8 @@ export default async function DevolucoesPage() {
       ) : (
         <div className="card divide-y divide-ink-100">
           {devolucoes.map((d) => (
-            <Link
-              key={d.id}
-              href={`/colaboradores/${d.colaboradorId}`}
-              className="flex items-center justify-between px-5 py-4 hover:bg-ink-100/40"
-            >
-              <div>
+            <div key={d.id} className="flex items-center justify-between px-5 py-2 hover:bg-ink-100/40">
+              <Link href={`/colaboradores/${d.colaboradorId}`} className="flex-1 py-2">
                 <p className="text-sm font-medium text-ink-800">
                   {d.quantidade}× {d.item.nome} · {d.colaborador.nome}
                 </p>
@@ -38,8 +35,9 @@ export default async function DevolucoesPage() {
                   {d.motivo} · {formatDateTime(d.devolvidoEm)}
                   {d.observacao ? ` · ${d.observacao}` : ""}
                 </p>
-              </div>
-            </Link>
+              </Link>
+              <DevolucaoDeleteButton id={d.id} />
+            </div>
           ))}
         </div>
       )}
