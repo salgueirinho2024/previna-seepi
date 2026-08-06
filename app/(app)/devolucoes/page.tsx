@@ -26,9 +26,12 @@ export default async function DevolucoesPage() {
       ) : (
         <div className="card divide-y divide-ink-100">
           {devolucoes.map((d) => (
-            <div key={d.id} className="flex items-center justify-between px-5 py-2 hover:bg-ink-100/40">
-              <Link href={`/colaboradores/${d.colaboradorId}`} className="flex-1 py-2">
-                <p className="text-sm font-medium text-ink-800">
+            <div
+              key={d.id}
+              className="flex flex-col gap-1 px-5 py-2 hover:bg-ink-100/40 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+            >
+              <Link href={`/colaboradores/${d.colaboradorId}`} className="min-w-0 flex-1 py-2">
+                <p className="truncate text-sm font-medium text-ink-800">
                   {d.quantidade}× {d.item.nome} · {d.colaborador.nome}
                 </p>
                 <p className="text-xs text-ink-300">
@@ -36,7 +39,9 @@ export default async function DevolucoesPage() {
                   {d.observacao ? ` · ${d.observacao}` : ""}
                 </p>
               </Link>
-              <DevolucaoDeleteButton id={d.id} />
+              <div className="shrink-0 self-start sm:self-center">
+                <DevolucaoDeleteButton id={d.id} />
+              </div>
             </div>
           ))}
         </div>

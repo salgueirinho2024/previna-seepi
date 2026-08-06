@@ -29,15 +29,15 @@ export default async function InventarioPage() {
               <Link
                 key={item.id}
                 href={`/inventario/${item.id}/editar`}
-                className="flex items-center justify-between px-5 py-4 hover:bg-ink-100/40"
+                className="flex flex-col gap-2 px-5 py-4 hover:bg-ink-100/40 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div>
-                  <p className="text-sm font-medium text-ink-800">{item.nome}</p>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-ink-800">{item.nome}</p>
                   <p className="text-xs text-ink-300">
                     CA {item.ca ?? "—"} · {item.fabricante ?? "—"} · {formatBRL(item.custoUnitario as unknown as number)}
                   </p>
                 </div>
-                <div className="text-right">
+                <div className="shrink-0 sm:text-right">
                   <p className="text-sm font-medium text-ink-800">{item.estoqueAtual} em estoque</p>
                   {baixo && <Badge className="bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400">estoque baixo</Badge>}
                 </div>

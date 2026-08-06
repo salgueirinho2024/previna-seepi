@@ -14,15 +14,6 @@ export default function LoginPage() {
           muted
           playsInline
         />
-        <div className="absolute inset-0 bg-ink-900/35" />
-        <div className="relative z-10 max-w-md px-10 text-center">
-          <div className="rounded-2xl bg-ink-900/70 px-8 py-6 backdrop-blur-md">
-            <h2 className="text-2xl font-semibold text-white">Segurança do trabalho, sem complicação</h2>
-            <p className="mt-3 text-sm text-white/80">
-              Controle os processos de segurança e saúde ocupacional da sua empresa em um só lugar.
-            </p>
-          </div>
-        </div>
       </div>
 
       {/* Login form */}

@@ -28,17 +28,17 @@ export default async function SolicitacoesPage() {
             <Link
               key={s.id}
               href={`/solicitacoes/${s.id}`}
-              className="flex items-center justify-between px-5 py-4 hover:bg-ink-100/40"
+              className="flex flex-col gap-2 px-5 py-4 hover:bg-ink-100/40 sm:flex-row sm:items-center sm:justify-between"
             >
-              <div>
-                <p className="text-sm font-medium text-ink-800">
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium text-ink-800">
                   #{s.numero} · {s.colaborador.nome}
                 </p>
                 <p className="text-xs text-ink-300">
                   {s.motivo} · {formatDateTime(s.createdAt)}
                 </p>
               </div>
-              <Badge className={statusBadgeClasses(s.status)}>{statusLabel(s.status)}</Badge>
+              <Badge className={`shrink-0 self-start ${statusBadgeClasses(s.status)}`}>{statusLabel(s.status)}</Badge>
             </Link>
           ))}
         </div>

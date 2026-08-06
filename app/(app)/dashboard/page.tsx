@@ -80,15 +80,15 @@ export default async function DashboardPage() {
                 <Link
                   key={a.id}
                   href={`/colaboradores/${a.colaborador.id}`}
-                  className="flex items-center justify-between py-3 hover:bg-ink-100/40"
+                  className="flex flex-col gap-1 py-3 hover:bg-ink-100/40 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
                 >
-                  <div>
-                    <p className="text-sm font-medium text-ink-800">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-medium text-ink-800">
                       {a.item.nome} · {a.colaborador.nome}
                     </p>
                     <p className="text-xs text-ink-300">Próxima troca: {formatDate(a.proximaTroca)}</p>
                   </div>
-                  <Badge className={a.status === "vencida" ? "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"}>
+                  <Badge className={`shrink-0 self-start sm:self-center ${a.status === "vencida" ? "bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400" : "bg-amber-500/10 text-amber-600 dark:text-amber-400"}`}>
                     {a.status === "vencida" ? `Vencida há ${Math.abs(dias)} dia(s)` : `Vence em ${dias} dia(s)`}
                   </Badge>
                 </Link>
@@ -114,15 +114,15 @@ export default async function DashboardPage() {
               <Link
                 key={s.id}
                 href={`/solicitacoes/${s.id}`}
-                className="flex items-center justify-between py-3 hover:bg-ink-100/40"
+                className="flex flex-col gap-1 py-3 hover:bg-ink-100/40 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
               >
-                <div>
-                  <p className="text-sm font-medium text-ink-800">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-ink-800">
                     #{s.numero} · {s.colaborador.nome}
                   </p>
                   <p className="text-xs text-ink-300">{formatDateTime(s.createdAt)}</p>
                 </div>
-                <Badge className={statusBadgeClasses(s.status)}>{statusLabel(s.status)}</Badge>
+                <Badge className={`shrink-0 self-start sm:self-center ${statusBadgeClasses(s.status)}`}>{statusLabel(s.status)}</Badge>
               </Link>
             ))}
           </div>

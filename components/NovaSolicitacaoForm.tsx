@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import type { SolicitacaoFormState } from "@/app/(app)/solicitacoes/actions";
 import { MOTIVOS_SOLICITACAO } from "@/lib/utils";
@@ -43,22 +43,14 @@ export function NovaSolicitacaoForm({
     return obrigatoriosPorSetor[colaboradorSelecionado.setorId] ?? null;
   }, [colaboradorSelecionado, obrigatoriosPorSetor]);
 
-  // Ao selecionar (ou já vir pré-selecionado) um colaborador, pré-marca os EPIs
-  // obrigatórios do setor dele — útil pra saber o que entregar num funcionário novo.
-  useEffect(() => {
-    if (!colaboradorSelecionado?.setorId) return;
-    const obrig = obrigatoriosPorSetor[colaboradorSelecionado.setorId];
-    if (!obrig || obrig.itemIds.length === 0) return;
-
-    setSelecionados((prev) => {
-      const next = { ...prev };
-      for (const itemId of obrig.itemIds) {
-        if (!(itemId in next)) next[itemId] = 1;
-      }
-      return next;
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [colaboradorSelecionado?.id]);
+  // Apenas informativo: mostra quais EPIs são obrigatórios para o setor do
+  // colaborador selecionado. Não marca nada sozinho — quem lança escolhe.
+  const nomesObrigatorios = useMemo(() => {
+    if (!obrigatoriosDoSetor) return [];
+    return obrigatoriosDoSetor.itemIds
+      .map((id) => itens.find((i) => i.id === id)?.nome)
+      .filter((n): n is string => Boolean(n));
+  }, [obrigatoriosDoSetor, itens]);
 
   const resultados = useMemo(() => {
     if (!busca.trim() || colaboradorSelecionado) return [];
@@ -91,6 +83,18 @@ export function NovaSolicitacaoForm({
                 {colaboradorSelecionado.matricula && (
                   <p className="text-xs text-ink-500">{colaboradorSelecionado.matricula}</p>
                 )}
+                {nomesObrigatorios.length > 0 ? (
+                  <p className="mt-2 text-xs text-ink-500">
+                    <span className="font-medium text-amber-700 dark:text-amber-400">
+                      EPIs obrigatórios do setor {obrigatoriosDoSetor?.nome}:
+                    </span>{" "}
+                    {nomesObrigatorios.join(", ")}
+                  </p>
+                ) : colaboradorSelecionado.setorId ? (
+                  <p className="mt-2 text-xs text-ink-300">Nenhum EPI obrigatório cadastrado para o setor deste colaborador.</p>
+                ) : (
+                  <p className="mt-2 text-xs text-ink-300">Este colaborador não tem setor definido.</p>
+                )}
               </div>
               <button
                 type="button"
@@ -100,17 +104,6 @@ export function NovaSolicitacaoForm({
                 Trocar
               </button>
             </div>
-
-            {obrigatoriosDoSetor && obrigatoriosDoSetor.itemIds.length > 0 ? (
-              <p className="rounded-lg bg-amber-500/10 px-4 py-2.5 text-xs text-amber-700 dark:text-amber-400">
-                ✓ {obrigatoriosDoSetor.itemIds.length} EPI(s) obrigatório(s) do setor{" "}
-                <strong>{obrigatoriosDoSetor.nome}</strong> já foram marcados abaixo — confira antes de enviar.
-              </p>
-            ) : colaboradorSelecionado.setorId ? (
-              <p className="text-xs text-ink-300">Nenhum EPI obrigatório cadastrado para o setor deste colaborador.</p>
-            ) : (
-              <p className="text-xs text-ink-300">Este colaborador não tem setor definido — cadastre o setor para sugestão automática de EPIs.</p>
-            )}
           </div>
         ) : (
           <div className="relative">
@@ -164,15 +157,15 @@ export function NovaSolicitacaoForm({
             return (
               <div
                 key={item.id}
-                className={`flex items-center justify-between rounded-lg border px-4 py-3 ${
+                className={`flex flex-wrap items-center justify-between gap-2 rounded-lg border px-4 py-3 ${
                   marcado ? "border-brand-500/40 bg-brand-50" : "border-ink-100"
                 }`}
               >
-                <label className="flex flex-1 items-center gap-3">
-                  <input type="checkbox" checked={marcado} onChange={() => toggleItem(item.id)} className="h-4 w-4 accent-brand-500" />
-                  <div>
+                <label className="flex min-w-0 flex-1 items-center gap-3">
+                  <input type="checkbox" checked={marcado} onChange={() => toggleItem(item.id)} className="h-4 w-4 shrink-0 accent-brand-500" />
+                  <div className="min-w-0">
                     <p className="flex items-center gap-2 text-sm font-medium text-ink-800">
-                      {item.nome}
+                      <span className="truncate">{item.nome}</span>
                       {obrigatorio && (
                         <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-amber-700 dark:text-amber-400">
                           Obrigatório

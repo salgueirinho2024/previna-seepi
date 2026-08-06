@@ -26,7 +26,7 @@ export function LoginForm() {
       setError("E-mail ou senha inválidos.");
       return;
     }
-    router.push("/dashboard");
+    router.push("/inicio");
     router.refresh();
   }
 

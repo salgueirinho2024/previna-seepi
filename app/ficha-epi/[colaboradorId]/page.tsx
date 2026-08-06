@@ -34,13 +34,13 @@ export default async function FichaEpiPage({ params }: { params: { colaboradorId
   );
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-8 print:px-0 print:py-0">
+    <div className="mx-auto max-w-4xl px-3 py-6 sm:px-6 sm:py-8 print:px-0 print:py-0">
       <div className="mb-6 flex items-center justify-between print:hidden">
         <Logo size={26} />
         <PrintButton />
       </div>
 
-      <div className="card p-8 print:border-0 print:p-0 print:shadow-none">
+      <div className="card p-4 sm:p-8 print:border-0 print:p-0 print:shadow-none">
         {/* Cabeçalho */}
         <div className="mb-6 flex items-start justify-between border-b border-ink-100 pb-6">
           <div>
@@ -84,7 +84,8 @@ export default async function FichaEpiPage({ params }: { params: { colaboradorId
         </div>
 
         {/* Tabela de entregas */}
-        <table className="w-full border-collapse text-xs">
+        <div className="-mx-1 overflow-x-auto px-1 print:overflow-visible">
+        <table className="w-full min-w-[640px] border-collapse text-xs print:min-w-0">
           <thead>
             <tr className="border-b-2 border-ink-800 text-left uppercase tracking-wide text-ink-500">
               <th className="py-2 pr-2">Data</th>
@@ -126,6 +127,7 @@ export default async function FichaEpiPage({ params }: { params: { colaboradorId
             )}
           </tbody>
         </table>
+        </div>
 
         {/* Declaração e assinatura */}
         <div className="mt-10 space-y-6 text-xs text-ink-700">
@@ -135,7 +137,7 @@ export default async function FichaEpiPage({ params }: { params: { colaboradorId
             destina(m), de acordo com a NR-6, comunicando qualquer alteração que o torne impróprio para uso.
           </p>
 
-          <div className="grid grid-cols-2 gap-10 pt-10">
+          <div className="grid grid-cols-1 gap-10 pt-10 sm:grid-cols-2 print:grid-cols-2">
             <div className="border-t border-ink-800 pt-2 text-center">
               <p>{colaborador.nome}</p>
               <p className="text-ink-300">Assinatura do colaborador</p>
