@@ -12,6 +12,7 @@ const NAV = [
   { href: "/inventario", label: "Inventário", icon: InventarioIcon },
   { href: "/colaboradores", label: "Colaboradores", icon: ColaboradoresIcon },
   { href: "/setores", label: "Setores", icon: SetoresIcon },
+  { href: "/treinamentos", label: "Treinamentos", icon: TreinamentosIcon },
   { href: "/solicitacoes", label: "Entregas", icon: SolicitacoesIcon },
   { href: "/devolucoes", label: "Devoluções", icon: DevolucoesIcon },
   { href: "/relatorios", label: "Relatórios", icon: RelatoriosIcon },
@@ -233,6 +234,14 @@ function SetoresIcon({ active }: { active?: boolean }) {
       <rect x="13" y="3" width="8" height="8" rx="1.5" />
       <rect x="3" y="13" width="8" height="8" rx="1.5" />
       <rect x="13" y="13" width="8" height="8" rx="1.5" />
+    </svg>
+  );
+}
+function TreinamentosIcon({ active }: { active?: boolean }) {
+  return (
+    <svg {...iconProps(active)}>
+      <path d="M22 10 12 5 2 10l10 5 10-5Z" />
+      <path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5" />
     </svg>
   );
 }

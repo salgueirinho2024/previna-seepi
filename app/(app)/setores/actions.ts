@@ -9,6 +9,7 @@ import { requireSession } from "@/lib/session";
 const schema = z.object({
   nome: z.string().min(2, "Informe o nome do setor"),
   itemIds: z.array(z.string()).default([]),
+  treinamentoIds: z.array(z.string()).default([]),
 });
 
 export type SetorFormState = { error?: string };
@@ -17,6 +18,7 @@ function parseForm(formData: FormData) {
   return schema.safeParse({
     nome: formData.get("nome"),
     itemIds: formData.getAll("itemId").map(String),
+    treinamentoIds: formData.getAll("treinamentoId").map(String),
   });
 }
 
@@ -32,10 +34,14 @@ export async function createSetor(_prev: SetorFormState, formData: FormData): Pr
       itensObrigatorios: {
         create: parsed.data.itemIds.map((itemId) => ({ itemId })),
       },
+      treinamentosObrigatorios: {
+        create: parsed.data.treinamentoIds.map((treinamentoId) => ({ treinamentoId })),
+      },
     },
   });
 
   revalidatePath("/setores");
+  revalidatePath("/treinamentos");
   redirect("/setores");
 }
 
@@ -57,9 +63,14 @@ export async function updateSetor(
     prisma.setorItemEPI.createMany({
       data: parsed.data.itemIds.map((itemId) => ({ setorId: id, itemId })),
     }),
+    prisma.setorTreinamento.deleteMany({ where: { setorId: id } }),
+    prisma.setorTreinamento.createMany({
+      data: parsed.data.treinamentoIds.map((treinamentoId) => ({ setorId: id, treinamentoId })),
+    }),
   ]);
 
   revalidatePath("/setores");
+  revalidatePath("/treinamentos");
   redirect("/setores");
 }
 
@@ -68,5 +79,6 @@ export async function deleteSetor(id: string) {
   const session = await requireSession();
   await prisma.setor.deleteMany({ where: { id, empresaId: session.user.empresaId } });
   revalidatePath("/setores");
+  revalidatePath("/treinamentos");
   redirect("/setores");
 }

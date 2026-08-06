@@ -6,16 +6,23 @@ import { createSetor } from "../actions";
 
 export default async function NovoSetorPage() {
   const session = await requireSession();
-  const itens = await prisma.itemEPI.findMany({
-    where: { empresaId: session.user.empresaId },
-    orderBy: { nome: "asc" },
-    select: { id: true, nome: true, ca: true },
-  });
+  const [itens, treinamentos] = await Promise.all([
+    prisma.itemEPI.findMany({
+      where: { empresaId: session.user.empresaId },
+      orderBy: { nome: "asc" },
+      select: { id: true, nome: true, ca: true },
+    }),
+    prisma.treinamentoCatalogo.findMany({
+      where: { empresaId: session.user.empresaId },
+      orderBy: { nome: "asc" },
+      select: { id: true, nome: true, periodicidadeDias: true },
+    }),
+  ]);
 
   return (
     <div>
-      <PageHeader title="Novo setor" subtitle="Defina o setor e os EPIs obrigatórios para quem trabalha nele" />
-      <SetorForm action={createSetor} itens={itens} submitLabel="Cadastrar setor" />
+      <PageHeader title="Novo setor" subtitle="Defina o setor e os EPIs e treinamentos obrigatórios para quem trabalha nele" />
+      <SetorForm action={createSetor} itens={itens} treinamentos={treinamentos} submitLabel="Cadastrar setor" />
     </div>
   );
 }

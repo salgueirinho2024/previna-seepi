@@ -76,6 +76,29 @@ async function main() {
     },
   });
 
+  // Catálogo de treinamentos e vínculo com os setores
+  const treinamentos = await Promise.all(
+    [
+      { nome: "Integração de Segurança", descricao: "Treinamento introdutório obrigatório para todos os colaboradores.", cargaHorariaHoras: 4, periodicidadeDias: null },
+      { nome: "NR-35 Trabalho em Altura", descricao: "Capacitação para atividades acima de 2m de altura.", cargaHorariaHoras: 8, periodicidadeDias: 730 },
+      { nome: "NR-10 Segurança em Instalações Elétricas", descricao: "Obrigatório para quem atua em instalações e serviços com eletricidade.", cargaHorariaHoras: 40, periodicidadeDias: 730 },
+      { nome: "Brigada de Incêndio", descricao: "Combate a princípio de incêndio e abandono de área.", cargaHorariaHoras: 16, periodicidadeDias: 365 },
+    ].map((data) => prisma.treinamentoCatalogo.create({ data: { ...data, empresaId: empresa.id } }))
+  );
+  const [integracao, nr35, nr10, brigada] = treinamentos;
+
+  await prisma.setorTreinamento.createMany({
+    data: [
+      { setorId: setorProducao.id, treinamentoId: integracao.id },
+      { setorId: setorProducao.id, treinamentoId: brigada.id },
+      { setorId: setorManutencao.id, treinamentoId: integracao.id },
+      { setorId: setorManutencao.id, treinamentoId: nr35.id },
+      { setorId: setorManutencao.id, treinamentoId: nr10.id },
+      { setorId: setorSSMA.id, treinamentoId: integracao.id },
+      { setorId: setorSSMA.id, treinamentoId: brigada.id },
+    ],
+  });
+
   const colaboradores = await Promise.all(
     [
       { nome: "João da Silva", matricula: "FUNC001", cpf: "111.111.111-11", cargo: "Operador de Produção", setorId: setorProducao.id, unidadeId: unidadeIndustrial.id },
@@ -84,7 +107,53 @@ async function main() {
     ].map((data) => prisma.colaborador.create({ data: { ...data, empresaId: empresa.id } }))
   );
 
-  const [joao, maria] = colaboradores;
+  const [joao, maria, carlos] = colaboradores;
+
+  // Realizações de treinamento — um cenário de cada status pra popular o painel:
+  // João: integração feita há tempo (ok) + brigada vencendo em breve (atenção)
+  await prisma.treinamentoRealizacao.create({
+    data: {
+      empresaId: empresa.id,
+      colaboradorId: joao.id,
+      treinamentoId: integracao.id,
+      realizadoEm: new Date(Date.now() - 400 * 86400000),
+      validoAte: null,
+      instrutor: "SESI",
+    },
+  });
+  await prisma.treinamentoRealizacao.create({
+    data: {
+      empresaId: empresa.id,
+      colaboradorId: joao.id,
+      treinamentoId: brigada.id,
+      realizadoEm: new Date(Date.now() - 360 * 86400000),
+      validoAte: new Date(Date.now() + 5 * 86400000),
+      instrutor: "Corpo de Bombeiros",
+    },
+  });
+
+  // Carlos: NR-10 em dia, NR-35 vencida, integração pendente (nunca fez)
+  await prisma.treinamentoRealizacao.create({
+    data: {
+      empresaId: empresa.id,
+      colaboradorId: carlos.id,
+      treinamentoId: nr10.id,
+      realizadoEm: new Date(Date.now() - 30 * 86400000),
+      validoAte: new Date(Date.now() + 700 * 86400000),
+      instrutor: "SENAI",
+    },
+  });
+  await prisma.treinamentoRealizacao.create({
+    data: {
+      empresaId: empresa.id,
+      colaboradorId: carlos.id,
+      treinamentoId: nr35.id,
+      realizadoEm: new Date(Date.now() - 800 * 86400000),
+      validoAte: new Date(Date.now() - 70 * 86400000),
+      instrutor: "SENAI",
+    },
+  });
+  // (integração fica pendente de propósito, pra aparecer no painel)
 
   // Solicitação + entrega já concluída e assinada, para popular a Ficha de EPI de exemplo
   const solicitacao = await prisma.solicitacao.create({

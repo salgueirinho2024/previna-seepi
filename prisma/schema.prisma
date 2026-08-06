@@ -23,6 +23,8 @@ model Empresa {
   entregas      Entrega[]
   setores       Setor[]
   devolucoes    Devolucao[]
+  treinamentos  TreinamentoCatalogo[]
+  treinamentoRealizacoes TreinamentoRealizacao[]
 }
 
 model User {
@@ -68,6 +70,7 @@ model Colaborador {
   solicitacoes Solicitacao[]
   entregas     Entrega[]
   devolucoes   Devolucao[]
+  treinamentoRealizacoes TreinamentoRealizacao[]
 
   @@index([empresaId])
 }
@@ -84,6 +87,7 @@ model Setor {
 
   colaboradores     Colaborador[]
   itensObrigatorios SetorItemEPI[]
+  treinamentosObrigatorios SetorTreinamento[]
 
   @@index([empresaId])
 }
@@ -218,4 +222,62 @@ model Devolucao {
 
   @@index([empresaId])
   @@index([colaboradorId])
+}
+
+/// Catálogo de treinamentos que a empresa pode exigir dos colaboradores
+/// (ex: NR-35 Trabalho em Altura, Brigada de Incêndio, Integração).
+model TreinamentoCatalogo {
+  id                String   @id @default(cuid())
+  nome              String
+  descricao         String?
+  cargaHorariaHoras Int?
+  /// De quantos em quantos dias o treinamento precisa ser refeito.
+  /// Deixe em branco para um treinamento que não vence (ex: integração única).
+  periodicidadeDias Int?
+  createdAt         DateTime @default(now())
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  setoresObrigatorios SetorTreinamento[]
+  realizacoes         TreinamentoRealizacao[]
+
+  @@index([empresaId])
+}
+
+/// Treinamento obrigatório para um determinado setor (N:N entre Setor e TreinamentoCatalogo).
+model SetorTreinamento {
+  id String @id @default(cuid())
+
+  setorId String
+  setor   Setor @relation(fields: [setorId], references: [id], onDelete: Cascade)
+
+  treinamentoId String
+  treinamento   TreinamentoCatalogo @relation(fields: [treinamentoId], references: [id], onDelete: Cascade)
+
+  @@unique([setorId, treinamentoId])
+}
+
+/// Registro de que um colaborador realizou (ou renovou) um treinamento.
+/// validoAte é calculado no momento do registro a partir da periodicidadeDias do catálogo.
+model TreinamentoRealizacao {
+  id          String    @id @default(cuid())
+  realizadoEm DateTime  @default(now())
+  validoAte   DateTime?
+  instrutor   String?
+  observacao  String?
+  createdAt   DateTime  @default(now())
+
+  empresaId String
+  empresa   Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+
+  colaboradorId String
+  colaborador   Colaborador @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
+
+  treinamentoId String
+  treinamento   TreinamentoCatalogo @relation(fields: [treinamentoId], references: [id], onDelete: Cascade)
+
+  @@index([empresaId])
+  @@index([colaboradorId])
+  @@index([treinamentoId])
 }

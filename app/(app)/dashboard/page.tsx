@@ -10,7 +10,7 @@ export default async function DashboardPage() {
   const session = await requireSession();
   const empresaId = session.user.empresaId;
 
-  const [empresa, totalColaboradores, itens, solicitacoesPendentes, ultimasSolicitacoes, entregaItens] =
+  const [empresa, totalColaboradores, itens, solicitacoesPendentes, ultimasSolicitacoes, entregaItens, colaboradoresComSetor] =
     await Promise.all([
       prisma.empresa.findUniqueOrThrow({ where: { id: empresaId }, select: { diasAvisoTroca: true } }),
       prisma.colaborador.count({ where: { empresaId } }),
@@ -27,12 +27,31 @@ export default async function DashboardPage() {
         include: { item: true, entrega: { include: { colaborador: true } } },
         orderBy: { proximaTroca: "asc" },
       }),
+      prisma.colaborador.findMany({
+        where: { empresaId },
+        include: {
+          setor: { include: { treinamentosObrigatorios: true } },
+          treinamentoRealizacoes: { select: { treinamentoId: true, validoAte: true }, orderBy: { realizadoEm: "desc" } },
+        },
+      }),
     ]);
 
   const diasAvisoTroca = empresa.diasAvisoTroca;
 
   const totalItens = itens.length;
   const itensBaixoEstoque = itens.filter((i) => i.estoqueAtual <= i.estoqueMinimo).length;
+
+  let treinamentosPendentesOuVencidos = 0;
+  for (const c of colaboradoresComSetor) {
+    for (const ot of c.setor?.treinamentosObrigatorios ?? []) {
+      const ultima = c.treinamentoRealizacoes.find((r) => r.treinamentoId === ot.treinamentoId);
+      if (!ultima) {
+        treinamentosPendentesOuVencidos++;
+      } else if (ultima.validoAte && trocaStatus(ultima.validoAte, diasAvisoTroca) === "vencida") {
+        treinamentosPendentesOuVencidos++;
+      }
+    }
+  }
 
   const avisos = entregaItens
     .filter((ei) => trocaStatus(ei.proximaTroca!, diasAvisoTroca) !== "ok")
@@ -53,6 +72,17 @@ export default async function DashboardPage() {
         <StatCard label="Itens de EPI cadastrados" value={String(totalItens)} />
         <StatCard label="Itens com estoque baixo" value={String(itensBaixoEstoque)} tone={itensBaixoEstoque > 0 ? "danger" : "default"} />
         <StatCard label="Entregas pendentes" value={String(solicitacoesPendentes)} tone={solicitacoesPendentes > 0 ? "warning" : "default"} />
+      </div>
+
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <Link href="/treinamentos">
+          <StatCard
+            label="Treinamentos pendentes ou vencidos"
+            value={String(treinamentosPendentesOuVencidos)}
+            hint="Ver situação completa em Treinamentos"
+            tone={treinamentosPendentesOuVencidos > 0 ? "danger" : "default"}
+          />
+        </Link>
       </div>
 
       <div className="card mb-8 p-5">

@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { PageHeader, EmptyState } from "@/components/ui";
-import { formatDateTime } from "@/lib/utils";
+import { formatDate, formatDateTime } from "@/lib/utils";
 import { DeleteButton } from "@/components/DeleteButton";
+import { RealizacaoDeleteButton } from "@/components/RealizacaoDeleteButton";
 import { deleteColaborador } from "../actions";
 
 export default async function ColaboradorDetalhePage({ params }: { params: { id: string } }) {
@@ -16,6 +17,7 @@ export default async function ColaboradorDetalhePage({ params }: { params: { id:
       setor: true,
       entregas: { include: { itens: { include: { item: true } } }, orderBy: { entregueEm: "desc" } },
       devolucoes: { include: { item: true }, orderBy: { devolvidoEm: "desc" } },
+      treinamentoRealizacoes: { include: { treinamento: true }, orderBy: { realizadoEm: "desc" } },
     },
   });
   if (!colaborador) notFound();
@@ -38,6 +40,9 @@ export default async function ColaboradorDetalhePage({ params }: { params: { id:
         </Link>
         <Link href={`/ficha-epi/${colaborador.id}`} className="btn-secondary">
           📄 Ficha de EPI
+        </Link>
+        <Link href={`/treinamentos/registrar?colaboradorId=${colaborador.id}`} className="btn-secondary">
+          🎓 Registrar treinamento
         </Link>
         <Link href={`/colaboradores/${colaborador.id}/editar`} className="btn-secondary">
           Editar
@@ -83,6 +88,32 @@ export default async function ColaboradorDetalhePage({ params }: { params: { id:
                     {d.motivo} · {formatDateTime(d.devolvidoEm)}
                     {d.observacao ? ` · ${d.observacao}` : ""}
                   </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="card mt-6 p-5">
+        <h2 className="mb-4 text-base font-semibold text-ink-900">Histórico de treinamentos</h2>
+        {colaborador.treinamentoRealizacoes.length === 0 ? (
+          <EmptyState title="Nenhum treinamento registrado ainda" />
+        ) : (
+          <div className="divide-y divide-ink-100">
+            {colaborador.treinamentoRealizacoes.map((r) => (
+              <div key={r.id} className="flex items-center justify-between gap-3 py-3">
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-ink-800">{r.treinamento.nome}</p>
+                  <p className="text-xs text-ink-300">
+                    Realizado em {formatDateTime(r.realizadoEm)}
+                    {r.instrutor ? ` · ${r.instrutor}` : ""}
+                    {r.validoAte ? ` · válido até ${formatDate(r.validoAte)}` : " · não vence"}
+                    {r.observacao ? ` · ${r.observacao}` : ""}
+                  </p>
+                </div>
+                <div className="shrink-0">
+                  <RealizacaoDeleteButton id={r.id} />
                 </div>
               </div>
             ))}

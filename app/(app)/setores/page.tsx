@@ -9,6 +9,7 @@ export default async function SetoresPage() {
     where: { empresaId: session.user.empresaId },
     include: {
       itensObrigatorios: { include: { item: true } },
+      treinamentosObrigatorios: { include: { treinamento: true } },
       _count: { select: { colaboradores: true } },
     },
     orderBy: { nome: "asc" },
@@ -38,18 +39,26 @@ export default async function SetoresPage() {
               <div>
                 <p className="text-sm font-medium text-ink-800">{s.nome}</p>
                 <p className="text-xs text-ink-300">
-                  {s._count.colaboradores} colaborador(es) · {s.itensObrigatorios.length} EPI(s) obrigatório(s)
+                  {s._count.colaboradores} colaborador(es) · {s.itensObrigatorios.length} EPI(s) obrigatório(s) ·{" "}
+                  {s.treinamentosObrigatorios.length} treinamento(s) obrigatório(s)
                 </p>
               </div>
               <div className="flex flex-wrap gap-1.5">
-                {s.itensObrigatorios.length === 0 ? (
-                  <span className="text-xs text-ink-300">Nenhum EPI obrigatório definido</span>
+                {s.itensObrigatorios.length === 0 && s.treinamentosObrigatorios.length === 0 ? (
+                  <span className="text-xs text-ink-300">Nenhum EPI ou treinamento obrigatório definido</span>
                 ) : (
-                  s.itensObrigatorios.map((si) => (
-                    <Badge key={si.id} className="bg-ink-100 text-ink-700 dark:text-ink-800">
-                      {si.item.nome}
-                    </Badge>
-                  ))
+                  <>
+                    {s.itensObrigatorios.map((si) => (
+                      <Badge key={si.id} className="bg-ink-100 text-ink-700 dark:text-ink-800">
+                        {si.item.nome}
+                      </Badge>
+                    ))}
+                    {s.treinamentosObrigatorios.map((st) => (
+                      <Badge key={st.id} className="bg-brand-100 text-brand-800">
+                        🎓 {st.treinamento.nome}
+                      </Badge>
+                    ))}
+                  </>
                 )}
               </div>
             </Link>

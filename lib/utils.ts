@@ -67,6 +67,39 @@ export function statusBadgeClasses(status: string) {
   }
 }
 
+/** Classifica a situação de um treinamento de um colaborador. */
+export type TreinamentoStatus = "pendente" | "vencido" | "atencao" | "ok" | "sem_vencimento";
+
+export function treinamentoStatusBadgeClasses(status: TreinamentoStatus) {
+  switch (status) {
+    case "pendente":
+      return "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400";
+    case "vencido":
+      return "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400";
+    case "atencao":
+      return "bg-amber-500/10 text-amber-600 dark:text-amber-400";
+    case "sem_vencimento":
+      return "bg-ink-100 text-ink-700 dark:text-ink-800";
+    default:
+      return "bg-brand-100 text-brand-800";
+  }
+}
+
+export function treinamentoStatusLabel(status: TreinamentoStatus) {
+  switch (status) {
+    case "pendente":
+      return "Pendente";
+    case "vencido":
+      return "Vencido";
+    case "atencao":
+      return "A vencer";
+    case "sem_vencimento":
+      return "Sem vencimento";
+    default:
+      return "Em dia";
+  }
+}
+
 export function statusLabel(status: string) {
   switch (status) {
     case "entregue":
