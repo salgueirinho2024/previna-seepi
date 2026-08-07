@@ -36,7 +36,10 @@ export default async function CatalogoTreinamentosPage() {
               className="flex flex-col gap-2 px-5 py-4 hover:bg-ink-100/40 sm:flex-row sm:items-center sm:justify-between"
             >
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-ink-800">{t.nome}</p>
+                <p className="truncate text-sm font-medium text-ink-800">
+                  {t.nome}
+                  {t.norma ? <span className="ml-2 text-xs font-normal text-brand-700">{t.norma}</span> : ""}
+                </p>
                 <p className="text-xs text-ink-300">
                   {t.cargaHorariaHoras ? `${t.cargaHorariaHoras}h` : "carga horária não informada"} ·{" "}
                   {t.periodicidadeDias ? `validade ${t.periodicidadeDias} dias` : "não vence"}

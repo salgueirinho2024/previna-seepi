@@ -11,13 +11,14 @@ import {
   type TreinamentoStatus,
 } from "@/lib/utils";
 import { RealizacaoDeleteButton } from "@/components/RealizacaoDeleteButton";
+import { DiasAvisoTreinamentoForm } from "@/components/ConfiguracoesForm";
 
 export default async function TreinamentosPage() {
   const session = await requireSession();
   const empresaId = session.user.empresaId;
 
   const [empresa, colaboradores, ultimasRealizacoes] = await Promise.all([
-    prisma.empresa.findUniqueOrThrow({ where: { id: empresaId }, select: { diasAvisoTroca: true } }),
+    prisma.empresa.findUniqueOrThrow({ where: { id: empresaId }, select: { diasAvisoTreinamento: true } }),
     prisma.colaborador.findMany({
       where: { empresaId },
       include: {
@@ -38,11 +39,12 @@ export default async function TreinamentosPage() {
     }),
   ]);
 
-  const diasAviso = empresa.diasAvisoTroca;
+  const diasAviso = empresa.diasAvisoTreinamento;
 
   type Linha = {
     colaboradorId: string;
     colaboradorNome: string;
+    setorId: string | null;
     setorNome: string | null;
     treinamentoId: string;
     treinamentoNome: string;
@@ -72,6 +74,7 @@ export default async function TreinamentosPage() {
       linhas.push({
         colaboradorId: c.id,
         colaboradorNome: c.nome,
+        setorId: c.setor?.id ?? null,
         setorNome: c.setor?.nome ?? null,
         treinamentoId: ot.treinamentoId,
         treinamentoNome: ot.treinamento.nome,
@@ -95,6 +98,31 @@ export default async function TreinamentosPage() {
   };
   const linhasOrdenadas = [...linhas].sort((a, b) => ordemStatus[a.status] - ordemStatus[b.status]);
 
+  // Agrupamento por setor: quantas pendências (pendente + vencido + a vencer) cada setor tem.
+  type ResumoSetor = { setorId: string | null; setorNome: string; pendentes: number; vencidos: number; aVencer: number; total: number };
+  const resumoPorSetorMap = new Map<string, ResumoSetor>();
+  for (const l of linhas) {
+    const chave = l.setorId ?? "sem-setor";
+    if (!resumoPorSetorMap.has(chave)) {
+      resumoPorSetorMap.set(chave, {
+        setorId: l.setorId,
+        setorNome: l.setorNome ?? "Sem setor",
+        pendentes: 0,
+        vencidos: 0,
+        aVencer: 0,
+        total: 0,
+      });
+    }
+    const r = resumoPorSetorMap.get(chave)!;
+    r.total++;
+    if (l.status === "pendente") r.pendentes++;
+    if (l.status === "vencido") r.vencidos++;
+    if (l.status === "atencao") r.aVencer++;
+  }
+  const resumoPorSetor = [...resumoPorSetorMap.values()]
+    .filter((r) => r.pendentes + r.vencidos + r.aVencer > 0)
+    .sort((a, b) => b.vencidos + b.pendentes - (a.vencidos + a.pendentes));
+
   return (
     <div>
       <PageHeader
@@ -109,6 +137,9 @@ export default async function TreinamentosPage() {
         <Link href="/treinamentos/catalogo" className="btn-secondary">
           Catálogo de treinamentos
         </Link>
+        <Link href="/treinamentos/relatorios" className="btn-secondary">
+          Relatórios
+        </Link>
       </div>
 
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -116,6 +147,42 @@ export default async function TreinamentosPage() {
         <StatCard label="Vencidos" value={String(vencidos)} tone={vencidos > 0 ? "danger" : "default"} />
         <StatCard label="A vencer" value={String(aVencer)} tone={aVencer > 0 ? "warning" : "default"} />
         <StatCard label="Em dia" value={String(emDia)} tone="brand" />
+      </div>
+
+      {resumoPorSetor.length > 0 && (
+        <div className="card mb-8 p-5">
+          <h2 className="mb-1 text-base font-semibold text-ink-900">Pendências por setor</h2>
+          <p className="mb-4 text-sm text-ink-500">
+            Setores com colaboradores pendentes, vencidos ou com treinamento a vencer.
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {resumoPorSetor.map((r) => (
+              <Badge
+                key={r.setorId ?? "sem-setor"}
+                className={
+                  r.vencidos + r.pendentes > 0
+                    ? "bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400"
+                    : "bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                }
+              >
+                {r.setorNome}: {r.pendentes + r.vencidos} pendente(s)/vencido(s)
+                {r.aVencer > 0 ? ` · ${r.aVencer} a vencer` : ""}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <div className="card mb-8 p-5">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="text-base font-semibold text-ink-900">Prazo de aviso de vencimento</h2>
+            <p className="text-sm text-ink-500">
+              Um treinamento entra em &quot;A vencer&quot; quando faltam {diasAviso} dia(s) ou menos para o vencimento.
+            </p>
+          </div>
+          <DiasAvisoTreinamentoForm diasAvisoTreinamento={diasAviso} />
+        </div>
       </div>
 
       <h2 className="mb-3 text-base font-semibold text-ink-900">Situação por colaborador</h2>

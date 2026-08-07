@@ -16,6 +16,7 @@ async function main() {
       nome: "Bambuí Bioenergia S/A",
       cnpj: "00.000.000/0001-00",
       diasAvisoTroca: 30,
+      diasAvisoTreinamento: 30,
       unidades: {
         create: [{ nome: "Matriz" }, { nome: "Unidade Industrial" }],
       },
@@ -79,10 +80,10 @@ async function main() {
   // Catálogo de treinamentos e vínculo com os setores
   const treinamentos = await Promise.all(
     [
-      { nome: "Integração de Segurança", descricao: "Treinamento introdutório obrigatório para todos os colaboradores.", cargaHorariaHoras: 4, periodicidadeDias: null },
-      { nome: "NR-35 Trabalho em Altura", descricao: "Capacitação para atividades acima de 2m de altura.", cargaHorariaHoras: 8, periodicidadeDias: 730 },
-      { nome: "NR-10 Segurança em Instalações Elétricas", descricao: "Obrigatório para quem atua em instalações e serviços com eletricidade.", cargaHorariaHoras: 40, periodicidadeDias: 730 },
-      { nome: "Brigada de Incêndio", descricao: "Combate a princípio de incêndio e abandono de área.", cargaHorariaHoras: 16, periodicidadeDias: 365 },
+      { nome: "Integração de Segurança", norma: "Integração", descricao: "Treinamento introdutório obrigatório para todos os colaboradores.", cargaHorariaHoras: 4, periodicidadeDias: null },
+      { nome: "NR-35 Trabalho em Altura", norma: "NR-35", descricao: "Capacitação para atividades acima de 2m de altura.", cargaHorariaHoras: 8, periodicidadeDias: 730 },
+      { nome: "NR-10 Segurança em Instalações Elétricas", norma: "NR-10", descricao: "Obrigatório para quem atua em instalações e serviços com eletricidade.", cargaHorariaHoras: 40, periodicidadeDias: 730 },
+      { nome: "Brigada de Incêndio", norma: "NR-23", descricao: "Combate a princípio de incêndio e abandono de área.", cargaHorariaHoras: 16, periodicidadeDias: 365 },
     ].map((data) => prisma.treinamentoCatalogo.create({ data: { ...data, empresaId: empresa.id } }))
   );
   const [integracao, nr35, nr10, brigada] = treinamentos;

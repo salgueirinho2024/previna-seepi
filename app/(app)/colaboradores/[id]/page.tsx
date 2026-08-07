@@ -44,6 +44,9 @@ export default async function ColaboradorDetalhePage({ params }: { params: { id:
         <Link href={`/treinamentos/registrar?colaboradorId=${colaborador.id}`} className="btn-secondary">
           🎓 Registrar treinamento
         </Link>
+        <Link href={`/ficha-treinamento/${colaborador.id}`} className="btn-secondary">
+          📄 Ficha de treinamento
+        </Link>
         <Link href={`/colaboradores/${colaborador.id}/editar`} className="btn-secondary">
           Editar
         </Link>

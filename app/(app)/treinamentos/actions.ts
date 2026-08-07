@@ -6,8 +6,36 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { requireSession } from "@/lib/session";
 
+const configuracoesSchema = z.object({
+  diasAvisoTreinamento: z.coerce.number().int().min(1, "Informe ao menos 1 dia"),
+});
+
+export type ConfiguracoesTreinamentoFormState = { error?: string; success?: boolean };
+
+export async function updateConfiguracoesTreinamento(
+  _prev: ConfiguracoesTreinamentoFormState,
+  formData: FormData
+): Promise<ConfiguracoesTreinamentoFormState> {
+  const session = await requireSession();
+
+  const parsed = configuracoesSchema.safeParse({
+    diasAvisoTreinamento: formData.get("diasAvisoTreinamento"),
+  });
+  if (!parsed.success) return { error: parsed.error.issues[0]?.message ?? "Dados inválidos" };
+
+  await prisma.empresa.update({
+    where: { id: session.user.empresaId },
+    data: { diasAvisoTreinamento: parsed.data.diasAvisoTreinamento },
+  });
+
+  revalidatePath("/treinamentos");
+  revalidatePath("/treinamentos/configuracoes");
+  return { success: true };
+}
+
 const catalogoSchema = z.object({
   nome: z.string().min(2, "Informe o nome do treinamento"),
+  norma: z.string().optional(),
   descricao: z.string().optional(),
   cargaHorariaHoras: z.coerce.number().int().min(0).optional(),
   periodicidadeDias: z.coerce.number().int().min(0).optional(),
@@ -18,6 +46,7 @@ export type TreinamentoFormState = { error?: string };
 function parseCatalogoForm(formData: FormData) {
   return catalogoSchema.safeParse({
     nome: formData.get("nome"),
+    norma: formData.get("norma") || undefined,
     descricao: formData.get("descricao") || undefined,
     cargaHorariaHoras: formData.get("cargaHorariaHoras") || undefined,
     periodicidadeDias: formData.get("periodicidadeDias") || undefined,

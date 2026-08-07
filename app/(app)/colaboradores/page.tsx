@@ -3,13 +3,18 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { PageHeader, EmptyState } from "@/components/ui";
 
-export default async function ColaboradoresPage() {
+export default async function ColaboradoresPage({
+  searchParams,
+}: {
+  searchParams: { modulo?: string };
+}) {
   const session = await requireSession();
   const colaboradores = await prisma.colaborador.findMany({
     where: { empresaId: session.user.empresaId },
     include: { unidade: true },
     orderBy: { nome: "asc" },
   });
+  const sufixoModulo = searchParams.modulo === "treinamentos" ? "?modulo=treinamentos" : "";
 
   return (
     <div>
@@ -26,7 +31,7 @@ export default async function ColaboradoresPage() {
           {colaboradores.map((c) => (
             <Link
               key={c.id}
-              href={`/colaboradores/${c.id}`}
+              href={`/colaboradores/${c.id}${sufixoModulo}`}
               className="flex items-center justify-between px-5 py-4 hover:bg-ink-100/40"
             >
               <div>

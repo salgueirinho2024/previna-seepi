@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { Sidebar } from "@/components/Sidebar";
@@ -15,11 +16,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen flex-col bg-page lg:flex-row">
-      <Sidebar
-        empresaNome={session.user.empresaNome}
-        userName={session.user.name}
-        userImage={user?.image}
-      />
+      <Suspense fallback={null}>
+        <Sidebar
+          empresaNome={session.user.empresaNome}
+          userName={session.user.name}
+          userImage={user?.image}
+        />
+      </Suspense>
       <main className="flex-1 overflow-y-auto">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-8 sm:py-8">{children}</div>
       </main>

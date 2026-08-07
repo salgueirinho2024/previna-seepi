@@ -13,6 +13,8 @@ model Empresa {
   cnpj      String?
   // Com quantos dias de antecedência o dashboard deve avisar sobre trocas periódicas de EPI
   diasAvisoTroca Int @default(30)
+  // Com quantos dias de antecedência o módulo de Treinamentos deve avisar sobre vencimentos
+  diasAvisoTreinamento Int @default(30)
   createdAt DateTime @default(now())
 
   users         User[]
@@ -229,6 +231,8 @@ model Devolucao {
 model TreinamentoCatalogo {
   id                String   @id @default(cuid())
   nome              String
+  /// Norma/categoria do treinamento, ex: "NR-35", "Brigada de Incêndio". Livre, usado para agrupar e filtrar.
+  norma             String?
   descricao         String?
   cargaHorariaHoras Int?
   /// De quantos em quantos dias o treinamento precisa ser refeito.

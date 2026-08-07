@@ -14,9 +14,9 @@ const MODULOS = [
   },
   {
     nome: "Treinamentos",
-    descricao: "Controle de treinamentos obrigatórios, vencimentos e certificados.",
-    href: "#",
-    disponivel: false,
+    descricao: "Treinamentos obrigatórios por setor, vencimentos e histórico dos colaboradores.",
+    href: "/treinamentos",
+    disponivel: true,
     icon: TreinamentoIcon,
   },
   {

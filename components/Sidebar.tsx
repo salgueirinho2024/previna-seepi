@@ -2,22 +2,44 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/Logo";
 import { signOut } from "next-auth/react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
-const NAV = [
+type NavItem = {
+  href: string;
+  label: string;
+  icon: (props: { active?: boolean }) => React.ReactNode;
+  /** Caminho usado para decidir se o item está ativo, quando o href tem querystring. */
+  match?: string;
+};
+
+const NAV_EPI: NavItem[] = [
   { href: "/dashboard", label: "Painel", icon: PainelIcon },
   { href: "/inventario", label: "Inventário", icon: InventarioIcon },
   { href: "/colaboradores", label: "Colaboradores", icon: ColaboradoresIcon },
   { href: "/setores", label: "Setores", icon: SetoresIcon },
-  { href: "/treinamentos", label: "Treinamentos", icon: TreinamentosIcon },
   { href: "/solicitacoes", label: "Entregas", icon: SolicitacoesIcon },
   { href: "/devolucoes", label: "Devoluções", icon: DevolucoesIcon },
   { href: "/relatorios", label: "Relatórios", icon: RelatoriosIcon },
   { href: "/configuracoes", label: "Configurações", icon: ConfiguracoesIcon },
 ];
+
+const NAV_TREINAMENTOS: NavItem[] = [
+  { href: "/treinamentos", label: "Painel", icon: PainelIcon },
+  { href: "/colaboradores?modulo=treinamentos", label: "Colaboradores", icon: ColaboradoresIcon, match: "/colaboradores" },
+  { href: "/setores?modulo=treinamentos", label: "Setores", icon: SetoresIcon, match: "/setores" },
+  { href: "/treinamentos/catalogo", label: "Catálogo", icon: TreinamentosIcon },
+  { href: "/treinamentos/registrar", label: "Registrar", icon: SolicitacoesIcon },
+  { href: "/treinamentos/relatorios", label: "Relatórios", icon: RelatoriosIcon },
+  { href: "/treinamentos/configuracoes", label: "Configurações", icon: ConfiguracoesIcon },
+];
+
+/** Páginas de dados compartilhados (Colaboradores/Setores) que podem ser acessadas
+ * tanto pelo módulo de EPI quanto pelo de Treinamentos. O parâmetro ?modulo=treinamentos
+ * na URL é o que diz ao menu lateral qual conjunto de itens mostrar nessas páginas. */
+const PAGINAS_COMPARTILHADAS = ["/colaboradores", "/setores"];
 
 export function Sidebar({
   empresaNome,
@@ -29,7 +51,25 @@ export function Sidebar({
   userImage?: string | null;
 }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [open, setOpen] = useState(false);
+
+  const emUmaPaginaCompartilhada = PAGINAS_COMPARTILHADAS.some(
+    (p) => pathname === p || pathname.startsWith(p + "/")
+  );
+  const isTreinamentos =
+    pathname.startsWith("/treinamentos") ||
+    (emUmaPaginaCompartilhada && searchParams.get("modulo") === "treinamentos");
+
+  const NAV = isTreinamentos ? NAV_TREINAMENTOS : NAV_EPI;
+  const moduloLabel = isTreinamentos ? "Treinamentos" : "Gestão de EPI";
+
+  // Match mais específico primeiro, pra "/treinamentos" (Painel) não "vencer"
+  // sobre "/treinamentos/catalogo" (Catálogo) na hora de decidir o item ativo.
+  const melhorMatch = [...NAV]
+    .map((item) => item.match ?? item.href.split("?")[0])
+    .filter((href) => pathname === href || pathname.startsWith(href + "/"))
+    .sort((a, b) => b.length - a.length)[0];
 
   return (
     <>
@@ -76,6 +116,8 @@ export function Sidebar({
         <div className="px-5 py-4">
           <p className="text-xs font-medium uppercase tracking-wide text-ink-300">Empresa</p>
           <p className="mt-0.5 truncate text-sm font-semibold text-ink-800">{empresaNome}</p>
+          <p className="mt-2.5 text-xs font-medium uppercase tracking-wide text-ink-300">Módulo</p>
+          <p className="mt-0.5 truncate text-sm font-semibold text-brand-700 dark:text-brand-400">{moduloLabel}</p>
           <Link
             href="/inicio"
             onClick={() => setOpen(false)}
@@ -88,7 +130,8 @@ export function Sidebar({
 
         <nav className="flex-1 space-y-1 overflow-y-auto px-3">
           {NAV.map((item) => {
-            const active = pathname === item.href || pathname.startsWith(item.href + "/");
+            const hrefSemQuery = item.href.split("?")[0];
+            const active = melhorMatch === (item.match ?? hrefSemQuery);
             const Icon = item.icon;
             return (
               <Link

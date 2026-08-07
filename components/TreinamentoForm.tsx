@@ -14,6 +14,7 @@ function SubmitButton({ label }: { label: string }) {
 
 type TreinamentoInitial = {
   nome?: string;
+  norma?: string | null;
   descricao?: string | null;
   cargaHorariaHoras?: number | null;
   periodicidadeDias?: number | null;
@@ -41,6 +42,16 @@ export function TreinamentoForm({
             className="input"
             placeholder="Ex: NR-35 Trabalho em Altura"
             required
+          />
+        </div>
+
+        <div className="sm:col-span-2">
+          <label className="label">Norma / categoria (opcional)</label>
+          <input
+            name="norma"
+            defaultValue={initial?.norma ?? ""}
+            className="input"
+            placeholder="Ex: NR-35, Brigada de Incêndio, Integração"
           />
         </div>
 

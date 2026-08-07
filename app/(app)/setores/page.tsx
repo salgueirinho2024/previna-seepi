@@ -3,7 +3,11 @@ import { requireSession } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { PageHeader, EmptyState, Badge } from "@/components/ui";
 
-export default async function SetoresPage() {
+export default async function SetoresPage({
+  searchParams,
+}: {
+  searchParams: { modulo?: string };
+}) {
   const session = await requireSession();
   const setores = await prisma.setor.findMany({
     where: { empresaId: session.user.empresaId },
@@ -14,13 +18,14 @@ export default async function SetoresPage() {
     },
     orderBy: { nome: "asc" },
   });
+  const sufixoModulo = searchParams.modulo === "treinamentos" ? "?modulo=treinamentos" : "";
 
   return (
     <div>
       <PageHeader
         title="Setores"
         subtitle={`${setores.length} setor(es) cadastrado(s)`}
-        action={{ href: "/setores/novo", label: "+ Novo setor" }}
+        action={{ href: `/setores/novo${sufixoModulo}`, label: "+ Novo setor" }}
       />
 
       {setores.length === 0 ? (
@@ -33,7 +38,7 @@ export default async function SetoresPage() {
           {setores.map((s) => (
             <Link
               key={s.id}
-              href={`/setores/${s.id}/editar`}
+              href={`/setores/${s.id}/editar${sufixoModulo}`}
               className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 hover:bg-ink-100/40"
             >
               <div>
